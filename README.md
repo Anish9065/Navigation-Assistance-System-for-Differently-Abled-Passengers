@@ -1,45 +1,60 @@
- # Navigation-Assistance-System-for-Differently-Abled-Passengers
- 🚉 Railway Navigation Assistance System
-Empowering Differently-Abled Passengers Through Computer Vision
+# Navigation Assistance System for Differently-Abled Passengers at Railway Stations
 
-A real-time AI-powered navigation system that detects passengers, wheelchair users, station landmarks, and obstacles from CCTV feeds — and delivers turn-by-turn audio & visual guidance to help differently-abled travellers navigate railway stations independently.
+🚉 **Empowering Differently-Abled Passengers Through Computer Vision**
 
-</div>
+A real-time AI-powered navigation system using YOLOv8, OpenCV, and Streamlit. It detects differently-abled passengers (wheelchair users, blind passengers, crutch users) from CCTV feeds and provides targeted navigation assistance, audio guidance, and tracking.
 
-📌 Overview
-Navigating a busy railway station can be overwhelming — especially for passengers with mobility impairments, visual challenges, or other disabilities. This system uses YOLOv8 object detection to continuously analyse camera feeds across the station and provide:
+---
 
-🔊 Audio guidance — spoken turn-by-turn directions via text-to-speech
-🖥️ Visual overlays — on-screen bounding boxes, HUD, and navigation arrows
-⚠️ Obstacle alerts — real-time warnings for hazards in the passenger's path
-♿ Wheelchair priority — automatic detection and priority routing for mobility-aid users
+## 📌 Features
 
+*   **Real-time Detection:** YOLOv8-based tracking of `normal_person`, `wheelchair_user`, `blind_person`, and `crutch_user`.
+*   **Intelligent Tracking:** Uses ByteTrack/DeepSORT logic via Ultralytics for maintaining passenger IDs and reducing false positives (e.g., merging person+wheelchair).
+*   **Navigation Assistance Logic:** Modular routing system suggesting ramps for wheelchairs and audio guidance for blind passengers.
+*   **Audio Guidance:** Multilingual text-to-speech support using `pyttsx3` and `gTTS`.
+*   **Web Dashboard:** Modern Streamlit app for live detection, analytics, and routing previews.
+*   **Production-Ready Structure:** Clean architecture, modular files, and Docker support.
 
-🎯 Detected Classes
-IDClassDescription0👤 PersonAll passengers and station staff1♿ WheelchairWheelchairs, walkers, crutches, mobility scooters2🪧 Station LandmarkPlatform signs, ticket counters, restrooms, exit gates3🚧 ObstacleLuggage, wet-floor signs, barriers, construction zones
+---
 
-🗂️ Project Structure
+## 🗂️ Project Structure
+
+```text
 railway_nav/
-├── configs/
-│   └── data.yaml              # Dataset config — classes & split paths
-├── dataset/
-│   ├── images/
-│   │   ├── train/             # 70% training images
-│   │   ├── val/               # 20% validation images
-│   │   └── test/              # 10% test images
-│   └── labels/                # Matching YOLO .txt annotation files
-├── scripts/
-│   ├── prepare_dataset.py     # Validate, split & visualise dataset
-│   ├── train.py               # YOLOv8 training pipeline
-│   └── navigate.py            # Real-time inference + audio/visual guidance
-├── runs/                      # Auto-generated: weights, charts, results
+├── dataset/            # Automatically managed dataset splits
+├── models/             # Contains data.yaml for training
+├── app/                # Streamlit web application
+│   └── main.py
+├── training/           # YOLOv8 training and dataset handling
+│   ├── dataset_handler.py
+│   └── train.py
+├── tracking/           # OpenCV detection & ByteTrack tracking logic
+│   └── detector.py
+├── navigation/         # Spatial reasoning & routing logic
+│   └── logic.py
+├── audio/              # Text-to-speech guidance logic
+│   └── guidance.py
+├── utils/              # Utility scripts
+├── outputs/            # Training runs, weights, charts
 ├── requirements.txt
-└── README.md
+├── Dockerfile
+└── main.py             # Entry point
+```
 
-⚙️ Installation
-bash# Clone the repository
-git clone https://github.com/your-username/railway-navigation-system.git
-cd railway-navigation-system
+---
+
+## ⚙️ Local Setup Instructions
+
+### 1. Prerequisites
+
+Ensure you have Python 3.9+ installed.
+
+### 2. Installation
+
+```bash
+# Clone the repository (if applicable)
+# git clone <repo-url>
+# cd railway-navigation-system
 
 # Create and activate virtual environment
 python -m venv venv
@@ -47,100 +62,72 @@ source venv/bin/activate        # Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
-requirements.txt includes:
+```
 
-ultralytics — YOLOv8 training & inference
-opencv-python — video stream processing
-pyttsx3 — cross-platform text-to-speech
-matplotlib, numpy — data visualisation
+*(Note: Depending on your OS, you may need system packages like `ffmpeg` or `libgl1-mesa-glx` for OpenCV, and `espeak` for pyttsx3 on Linux).*
 
+---
 
-🚀 Quick Start
-Step 1 — Annotate Your Images
-Use labelImg to draw bounding boxes with YOLO format:
-bashpip install labelImg
-labelImg
-Label using class IDs: 0=person, 1=wheelchair, 2=station_landmark, 3=obstacle
+## 🚀 Usage Guide
 
-Step 2 — Prepare the Dataset
-bashpython scripts/prepare_dataset.py \
-    --source ./raw/images \
-    --labels ./raw/labels
-Outputs:
+### 1. Dataset Preparation
 
-✅ Validates all label files for format errors
-✅ Splits into train / val / test (70% / 20% / 10%)
-✅ Generates class distribution charts
-✅ Saves annotated preview images
+If you have a custom dataset (images and YOLO txt labels), place them in a folder and run the dataset handler to split and verify:
 
+```bash
+python training/dataset_handler.py
+```
+*Modify paths inside `dataset_handler.py` `__main__` block if needed.*
 
-Step 3 — Train the Model
-bashpython scripts/train.py
-The script auto-selects the best YOLOv8 model based on your GPU:
-GPU VRAMModelSpeedAccuracy< 4 GByolov8n⚡ FastestGood4–8 GByolov8s🚀 FastBetter8–16 GByolov8m⚖️ BalancedGreat> 16 GByolov8l🎯 SlowerBest
-Force a specific variant:
-bashpython scripts/train.py --model yolov8m.pt
-# Resume interrupted training:
-python scripts/train.py --resume
+### 2. Training the Model
 
-Step 4 — Run the Navigation System
-bash# Live webcam feed
-python scripts/navigate.py \
-    --weights runs/train/railway_nav_v1/weights/best.pt \
-    --destination platform_2
+To train the YOLOv8n model from scratch on your dataset:
 
-# Pre-recorded station video
-python scripts/navigate.py \
-    --weights best.pt \
-    --source station_cctv.mp4 \
-    --destination ticket_counter \
-    --save
+```bash
+python training/train.py
+```
+*This handles augmentation, logs, and automatically saves the best weights to `outputs/`.*
 
-# Single image test
-python scripts/navigate.py \
-    --weights best.pt \
-    --source platform_photo.jpg
-Available destinations:
-platform_1 · platform_2 · ticket_counter · restroom · help_desk · exit
+### 3. Run the Streamlit Dashboard
 
-🧭 Navigation Logic
-The system uses zone-based spatial reasoning:
-Camera Frame
-┌─────────────────────────────────┐
-│   LEFT   │   CENTRE   │  RIGHT  │
-│  < 33%   │  33–67%    │  > 67%  │
-└─────────────────────────────────┘
-DetectionAudio OutputObstacle on left"Caution! Obstacle on your left. Please proceed carefully."Landmark on right"Station landmark on your right. Turn right."Wheelchair user"Wheelchair passenger detected. Priority assistance may be needed."Dense crowd"Heavy crowd ahead. Navigating to Platform 2."
-Audio cooldown: 8 seconds between repeated announcements to avoid fatigue.
+Launch the complete application UI:
 
-📊 Performance Targets
-MetricTargetNotesmAP@50> 0.80Aim for 0.85+ with 500+ labelled imagesInference FPS> 15Real-time on any NVIDIA GPUObstacle alert latency< 100msSafety-critical path
+```bash
+streamlit run app/main.py
+```
+Navigate to `http://localhost:8501` to view live detection, analytics, and assistance modules.
 
-💡 Tips to Improve Accuracy
+---
 
-More data — Target 300–500+ images per class
-Diverse lighting — Include day, night, fluorescent, shadow, rainy conditions
-Multiple camera angles — CCTV overhead + ground-level + side-angle views
-Class balance — Review the distribution chart; upsample under-represented classes
-Longer training — Increase epochs to 150 if mAP plateaus below 0.75
+## 🐳 Docker Deployment
 
+To deploy using Docker:
 
-🛠 Troubleshooting
-ProblemFixCUDA out of memoryLower batch in train.py to 8 or 4Low mAP on wheelchairAdd more wheelchair samples; verify label accuracyTTS not workingpip install pyttsx3 + install OS TTS engineSlow inference on CPUUse yolov8n.pt and set imgsz=416No valid pairs foundEnsure .txt label filenames match image filenames exactly
+```bash
+# Build the image
+docker build -t railway-nav-assist .
 
-🤝 Contributing
-Pull requests are welcome! Please:
+# Run the container
+docker run -p 8501:8501 --device=/dev/video0 railway-nav-assist
+```
+*(Remove `--device=/dev/video0` if you don't need webcam access inside the container).*
 
-Fork the repository
-Create a feature branch (git checkout -b feature/your-feature)
-Commit your changes (git commit -m 'Add your feature')
-Push and open a Pull Request
+---
 
+## 🧩 Architecture
 
-📄 License
-This project is licensed under the MIT License — see LICENSE for details.
+1.  **Input:** Video feed (CCTV / Webcam).
+2.  **Detection Module (YOLOv8 + ByteTrack):** Identifies and tracks passengers.
+3.  **Logic Controller:** Filters false positives, applies NMS, determines passenger type.
+4.  **Navigation Module:** Calculates accessible route based on passenger type and destination.
+5.  **Output (Streamlit & Audio):** Displays bounding boxes, tracking IDs, and plays audio TTS instructions.
 
-<div align="center">
-Made with ❤️ to make railway travel more accessible for everyone.
-⭐ Star this repo if it helps your project!
-</div>
+---
+
+## 💡 Notes on Accuracy & Advanced Features
+
+*   **False Positives:** The system is designed to classify a normal person + wheelchair as a `wheelchair_user` via the detection logic. Tuning `iou_thresh` and `conf_thresh` in the app helps mitigate low-light failure.
+*   **Future Scope:** Heatmap analytics, crowd density estimation, fall detection, and emergency alerts can be modularly added to the `tracking/` and `app/` pipelines.
+
+---
+*Developed for Major Projects, Hackathons, and Railway Accessibility Research.*
