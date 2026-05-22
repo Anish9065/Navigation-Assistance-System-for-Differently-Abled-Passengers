@@ -1,0 +1,25 @@
+Navigation Assistance Model — navigation_model_best.pt
+=======================================================
+Architecture : YOLOv8n (Nano) — from scratch
+Trained on   : Synthetic station dataset (300 train / 60 val images)
+Epochs       : ~30
+Image size   : 320 x 320
+Classes (6)  :
+  0: person
+  1: wheelchair_user
+  2: blind_person
+  3: person_with_crutches
+  4: elderly_person
+  5: person_with_luggage
+
+USAGE
+-----
+From web app  : Load Model → select navigation_model_best.pt → Detect
+From CLI      : python detect.py --mode live --model models/navigation_model_best.pt
+From Python   : from ultralytics import YOLO; m = YOLO("models/navigation_model_best.pt")
+
+NOTE
+----
+This model was trained on SYNTHETIC data (computer-generated station images).
+For production accuracy, retrain with REAL annotated images from your station.
+Use the Train page in the web app or: python train.py --epochs 100 --model models/navigation_model_best.pt

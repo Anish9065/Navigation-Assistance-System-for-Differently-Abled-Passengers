@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block title %}Train Model — Navigation Assistance{% endblock %}
+{% block page_title %}Train Model{% endblock %}
+
+{% block content %}
+<div class="grid-2">
+
+  <!-- Config Panel -->
+  <div class="card">
+    <div class="card-header"><i class="ti ti-settings"></i> Training Configuration</div>
+    <div class="card-body">
+
+      <label class="form-label">Base Model</label>
+      <select id="model-base" class="input-el mb">
+        <option value="yolov8n.pt">YOLOv8n — Nano (fastest, least accurate)</option>
+        <option value="yolov8s.pt" selected>YOLOv8s — Small (recommended)</option>
+        <option value="yolov8m.pt">YOLOv8m — Medium</option>
+        <option value="yolov8l.pt">YOLOv8l — Large</option>
+        <option value="yolov8x.pt">YOLOv8x — XLarge (most accurate)</option>
+      </select>
+
+      <label class="form-label">Dataset YAML Path</label>
+      <input id="yaml-path" class="input-el mb" type="text" value="config/dataset.yaml" placeholder="config/dataset.yaml"/>
+
+      <div class="grid-2-sm">
+        <div>
+          <label class="form-label">Epochs</label>
+          <input id="epochs" class="input-el mb" type="number" value="50" min="1" max="500"/>
+        </div>
+        <div>
+          <label class="form-label">Batch Size</label>
+          <input id="batch" class="input-el mb" type="number" value="16" min="1" max="128"/>
+        </div>
+        <div>
+          <label class="form-label">Image Size</label>
+          <select id="imgsz" class="input-el mb">
+            <option value="416">416</option>
+            <option value="640" selected>640</option>
+            <option value="1280">1280</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Run Name</label>
+          <input id="run-name" class="input-el mb" type="text" value="navigation_model"/>
+        </div>
+      </div>
+
+      <div class="row-gap mt">
+        <button class="btn btn-primary" id="btn-train" onclick="startTraining()">
+          <i class="ti ti-player-play"></i> Start Training
+        </button>
+        <button class="btn btn-danger" onclick="stopTraining()" id="btn-stop" disabled>
+          <i class="ti ti-player-stop"></i> Stop
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Panel -->
+  <div class="card">
+    <div class="card-header"><i class="ti ti-upload"></i> Upload Dataset / YAML</div>
+    <div class="card-body">
+      <p class="hint-text">Upload your dataset as a .zip file (YOLO format) or a custom dataset.yaml.</p>
+
+      <label class="form-label mt">Dataset ZIP</label>
+      <input type="file" id="dataset-zip" accept=".zip" class="input-el mb"/>
+      <button class="btn btn-secondary" onclick="uploadDataset()">
+        <i class="ti ti-upload"></i> Upload &amp; Extract
+      </button>
+
+      <label class="form-label mt" style="margin-top:1rem">Custom YAML</label>
+      <input type="file" id="yaml-file" accept=".yaml,.yml" class="input-el mb"/>
+      <button class="btn btn-secondary" onclick="uploadYaml()">
+        <i class="ti ti-file-upload"></i> Upload YAML
+      </button>
+
+      <div id="upload-status" class="status-text mt"></div>
+
+      <div class="info-box mt">
+        <strong>Expected Dataset Structure:</strong>
+        <pre class="code-block">data/dataset/
+├── images/
+│   ├── train/  ← training images
+│   └── val/    ← validation images
+└── labels/
+    ├── train/  ← YOLO .txt labels
+    └── val/</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Progress Panel -->
+<div class="card mt">
+  <div class="card-header"><i class="ti ti-activity"></i> Training Progress</div>
+  <div class="card-body">
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <p id="progress-text" class="status-text">Not started.</p>
+    <div id="log-box" class="log-box"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let pollTimer = null;
+
+async function startTraining() {
+  const payload = {
+    model_base: document.getElementById('model-base').value,
+    yaml_path:  document.getElementById('yaml-path').value,
+    epochs:     +document.getElementById('epochs').value,
+    batch:      +document.getElementById('batch').value,
+    imgsz:      +document.getElementById('imgsz').value,
+    name:       document.getElementById('run-name').value,
+    project:    'runs/train',
+  };
+  document.getElementById('btn-train').disabled = true;
+  document.getElementById('btn-stop').disabled  = false;
+  document.getElementById('log-box').innerHTML  = '';
+
+  const res  = await fetch('/api/train', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  log(data.message);
+  if (data.success) pollStatus();
+}
+
+async function stopTraining() {
+  await fetch('/api/train/stop', {method:'POST'});
+  clearInterval(pollTimer);
+  document.getElementById('btn-train').disabled = false;
+  document.getElementById('btn-stop').disabled  = true;
+}
+
+function pollStatus() {
+  pollTimer = setInterval(async () => {
+    const res  = await fetch('/api/train/status');
+    const data = await res.json();
+
+    document.getElementById('progress-bar').style.width = data.progress + '%';
+    document.getElementById('progress-text').textContent =
+      data.done ? '✅ Training complete!' :
+      data.error ? '❌ Error: ' + data.error :
+      data.running ? `Running… ${data.progress}%` : 'Idle';
+
+    const box = document.getElementById('log-box');
+    box.innerHTML = (data.log || []).map(l => `<div>${l}</div>`).join('');
+    box.scrollTop = box.scrollHeight;
+
+    if (data.done || data.error || !data.running) {
+      clearInterval(pollTimer);
+      document.getElementById('btn-train').disabled = false;
+      document.getElementById('btn-stop').disabled  = true;
+    }
+  }, 1500);
+}
+
+async function uploadDataset() {
+  const f = document.getElementById('dataset-zip').files[0];
+  if (!f) { alert('Select a .zip file first.'); return; }
+  const fd = new FormData(); fd.append('dataset', f);
+  const el = document.getElementById('upload-status');
+  el.textContent = 'Uploading…'; el.className = 'status-text';
+  const res  = await fetch('/api/upload_dataset', {method:'POST', body:fd});
+  const data = await res.json();
+  el.textContent = data.message; el.className = 'status-text ' + (data.success?'ok':'err');
+}
+
+async function uploadYaml() {
+  const f = document.getElementById('yaml-file').files[0];
+  if (!f) { alert('Select a .yaml file first.'); return; }
+  const fd = new FormData(); fd.append('yaml', f);
+  const el = document.getElementById('upload-status');
+  el.textContent = 'Uploading…'; el.className = 'status-text';
+  const res  = await fetch('/api/upload_yaml', {method:'POST', body:fd});
+  const data = await res.json();
+  el.textContent = data.success ? 'YAML saved to: ' + data.path : data.message;
+  el.className   = 'status-text ' + (data.success?'ok':'err');
+  if (data.success) document.getElementById('yaml-path').value = data.path;
+}
+
+function log(msg) {
+  const b = document.getElementById('log-box');
+  b.innerHTML += `<div>${msg}</div>`;
+  b.scrollTop  = b.scrollHeight;
+}
+</script>
+{% endblock %}

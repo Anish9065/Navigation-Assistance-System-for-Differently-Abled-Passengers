@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+{% block title %}Navigation — Navigation Assistance{% endblock %}
+{% block page_title %}Navigation & Station Map{% endblock %}
+
+{% block content %}
+<div class="grid-2">
+
+  <!-- Route Planner -->
+  <div class="card">
+    <div class="card-header"><i class="ti ti-route"></i> Route Planner</div>
+    <div class="card-body">
+      <label class="form-label">From</label>
+      <select id="route-from" class="input-el mb">
+        {% for zone_id, zone_name in station_map.zone_names.items() %}
+        <option value="{{ zone_id }}">{{ zone_name }}</option>
+        {% endfor %}
+      </select>
+
+      <label class="form-label">To</label>
+      <select id="route-to" class="input-el mb">
+        {% for zone_id, zone_name in station_map.zone_names.items() %}
+        <option value="{{ zone_id }}" {% if zone_id == 'platform_1' %}selected{% endif %}>{{ zone_name }}</option>
+        {% endfor %}
+      </select>
+
+      <button class="btn btn-primary" onclick="getRoute()">
+        <i class="ti ti-map-route"></i> Get Directions
+      </button>
+
+      <div id="route-result" class="route-result hidden">
+        <div class="route-path" id="route-path"></div>
+        <div class="route-steps" id="route-steps"></div>
+        <button class="btn btn-secondary mt" onclick="announceRoute()">
+          <i class="ti ti-volume"></i> Announce Route
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Navigation -->
+  <div class="card">
+    <div class="card-header"><i class="ti ti-live-view"></i> Live Navigation</div>
+    <div class="card-body">
+      <label class="form-label">Select Destination</label>
+      <select id="nav-dest" class="input-el mb" onchange="setDestination(this.value)">
+        {% for zone_id, zone_name in station_map.zone_names.items() %}
+        <option value="{{ zone_id }}" {% if zone_id == 'platform_1' %}selected{% endif %}>{{ zone_name }}</option>
+        {% endfor %}
+      </select>
+
+      <div class="live-wrap">
+        <img id="nav-feed" class="live-feed hidden" src="" alt="nav feed"/>
+        <div id="nav-placeholder" class="live-placeholder">
+          <i class="ti ti-camera-off"></i>
+          <p>Click Start to activate camera</p>
+        </div>
+      </div>
+
+      <div class="row-gap mt">
+        <button class="btn btn-primary" id="btn-nav-start" onclick="startNavCamera()">
+          <i class="ti ti-camera"></i> Start Camera
+        </button>
+        <button class="btn btn-danger" id="btn-nav-stop" onclick="stopNavCamera()" disabled>
+          <i class="ti ti-player-stop"></i> Stop
+        </button>
+      </div>
+
+      <!-- Model select -->
+      <div class="row-gap mt">
+        <select id="nav-model" class="input-el">
+          <option value="yolov8n.pt">yolov8n.pt (pretrained)</option>
+          {% for m in models %}
+          <option value="{{ m }}">{{ m }}</option>
+          {% endfor %}
+        </select>
+        <button class="btn btn-secondary" onclick="loadNavModel()">
+          <i class="ti ti-cpu"></i> Load
+        </button>
+      </div>
+      <p id="nav-model-status" class="status-text"></p>
+    </div>
+  </div>
+</div>
+
+<!-- Station Map Visualizer -->
+<div class="card mt">
+  <div class="card-header"><i class="ti ti-map-2"></i> Station Zone Map</div>
+  <div class="card-body">
+    <canvas id="station-canvas" width="860" height="420" style="width:100%;border-radius:10px;background:#0f1117;"></canvas>
+    <p class="hint-text mt" style="text-align:center">Click any zone to set it as destination</p>
+  </div>
+</div>
+
+<!-- Zone Descriptions -->
+<div class="card mt">
+  <div class="card-header"><i class="ti ti-list"></i> Zone Guide</div>
+  <div class="card-body">
+    <div class="zone-grid">
+      <div class="zone-card">
+        <i class="ti ti-door-enter" style="color:#c8b400"></i>
+        <strong>Entrance</strong>
+        <p>Main entry point of the station. Accessible ramps available.</p>
+      </div>
+      <div class="zone-card">
+        <i class="ti ti-building" style="color:#00c8c8"></i>
+        <strong>Main Hall</strong>
+        <p>Central hub connecting all areas. Information desk located here.</p>
+      </div>
+      <div class="zone-card">
+        <i class="ti ti-ticket" style="color:#c800c8"></i>
+        <strong>Ticket Counter</strong>
+        <p>Purchase or collect tickets. Accessible counter available.</p>
+      </div>
+      <div class="zone-card">
+        <i class="ti ti-train" style="color:#3264ff"></i>
+        <strong>Platform 1</strong>
+        <p>Departures — Local trains. Tactile path from elevator.</p>
+      </div>
+      <div class="zone-card">
+        <i class="ti ti-train" style="color:#ff6432"></i>
+        <strong>Platform 2</strong>
+        <p>Departures — Express trains. Wheelchair ramp on far end.</p>
+      </div>
+      <div class="zone-card">
+        <i class="ti ti-accessible" style="color:#00c864"></i>
+        <strong>Restroom</strong>
+        <p>Accessible restrooms with grab rails and wide doors.</p>
+      </div>
+      <div class="zone-card">
+        <i class="ti ti-elevator" style="color:#c87800"></i>
+        <strong>Elevator / Lift</strong>
+        <p>Connects all levels. Braille buttons and audio announcements.</p>
+      </div>
+      <div class="zone-card">
+        <i class="ti ti-armchair" style="color:#9632c8"></i>
+        <strong>Waiting Area</strong>
+        <p>Seating with priority chairs for elderly and differently-abled.</p>
+      </div>
+      <div class="zone-card">
+        <i class="ti ti-door-exit" style="color:#3232c8"></i>
+        <strong>Exit</strong>
+        <p>Station exit. Auto-doors and accessible path to street level.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const stationMap = {{ station_map | tojson }};
+let currentNavDest = 'platform_1';
+let routeSteps = [];
+
+// ── Route Planner ─────────────────────────────────
+async function getRoute() {
+  const from = document.getElementById('route-from').value;
+  const to   = document.getElementById('route-to').value;
+  const res  = await fetch('/api/navigation/route', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({from, to})
+  });
+  const data = await res.json();
+  routeSteps = data.steps;
+
+  const pathEl  = document.getElementById('route-path');
+  const stepsEl = document.getElementById('route-steps');
+
+  const nameMap = stationMap.zone_names;
+  pathEl.innerHTML = data.route.map((z,i) =>
+    `<span class="route-node">${nameMap[z]||z}</span>` +
+    (i < data.route.length-1 ? '<i class="ti ti-arrow-right" style="color:#8891a8"></i>' : '')
+  ).join('');
+
+  stepsEl.innerHTML = data.steps.map((s,i) =>
+    `<div class="step-item"><span class="step-num">${i+1}</span><span>${s}</span></div>`
+  ).join('');
+
+  document.getElementById('route-result').classList.remove('hidden');
+  drawMap(data.route);
+}
+
+function announceRoute() {
+  if (!routeSteps.length) return;
+  routeSteps.forEach((s, i) => {
+    setTimeout(() => speak(s), i * 3500);
+  });
+}
+
+// ── Live Navigation ───────────────────────────────
+function setDestination(val) {
+  currentNavDest = val;
+  speak('Setting destination to ' + val.replace(/_/g,' '));
+  if (document.getElementById('nav-feed').src.includes('video_feed')) {
+    startNavCamera();
+  }
+}
+
+function startNavCamera() {
+  const feed = document.getElementById('nav-feed');
+  feed.src = '/video_feed?destination=' + currentNavDest + '&t=' + Date.now();
+  feed.classList.remove('hidden');
+  document.getElementById('nav-placeholder').classList.add('hidden');
+  document.getElementById('btn-nav-start').disabled = true;
+  document.getElementById('btn-nav-stop').disabled  = false;
+  speak('Navigation started. Destination: ' + currentNavDest.replace(/_/g,' '));
+}
+
+async function stopNavCamera() {
+  const feed = document.getElementById('nav-feed');
+  feed.src = ''; feed.classList.add('hidden');
+  document.getElementById('nav-placeholder').classList.remove('hidden');
+  document.getElementById('btn-nav-start').disabled = false;
+  document.getElementById('btn-nav-stop').disabled  = true;
+  await fetch('/api/camera/stop', {method:'POST'});
+}
+
+async function loadNavModel() {
+  const model = document.getElementById('nav-model').value;
+  const el    = document.getElementById('nav-model-status');
+  el.textContent = 'Loading…';
+  const res  = await fetch('/api/load_model', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({model})
+  });
+  const data = await res.json();
+  el.textContent = data.message;
+  el.className   = 'status-text ' + (data.success ? 'ok' : 'err');
+}
+
+// ── Station Map Canvas ────────────────────────────
+const ZONE_COLORS = {
+  entrance:'#c8c800',main_hall:'#00c8c8',ticket_counter:'#c800c8',
+  platform_1:'#3264ff',platform_2:'#ff6432',restroom:'#00c864',
+  elevator:'#c87800',waiting_area:'#9632c8',exit:'#3232c8'
+};
+
+function drawMap(highlightPath) {
+  const canvas = document.getElementById('station-canvas');
+  const ctx    = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#0f1117';
+  ctx.fillRect(0,0,W,H);
+
+  // Draw edges
+  stationMap.edges.forEach(e => {
+    const s = stationMap.nodes.find(n=>n.id===e.from);
+    const t = stationMap.nodes.find(n=>n.id===e.to);
+    if (!s||!t) return;
+    ctx.beginPath();
+    ctx.moveTo(s.x*W, s.y*H);
+    ctx.lineTo(t.x*W, t.y*H);
+    ctx.strokeStyle = '#2a2d3e';
+    ctx.lineWidth   = 1.5;
+    ctx.stroke();
+  });
+
+  // Highlight route
+  if (highlightPath && highlightPath.length>1) {
+    for (let i=0;i<highlightPath.length-1;i++) {
+      const s = stationMap.nodes.find(n=>n.id===highlightPath[i]);
+      const t = stationMap.nodes.find(n=>n.id===highlightPath[i+1]);
+      if (!s||!t) continue;
+      ctx.beginPath();
+      ctx.moveTo(s.x*W, s.y*H);
+      ctx.lineTo(t.x*W, t.y*H);
+      ctx.strokeStyle = '#05b47e';
+      ctx.lineWidth   = 3;
+      ctx.setLineDash([6,4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  // Draw nodes
+  stationMap.nodes.forEach(n => {
+    const x=n.x*W, y=n.y*H;
+    const col = ZONE_COLORS[n.id] || '#aaaaaa';
+    const isHL = highlightPath && highlightPath.includes(n.id);
+    const r = isHL ? 20 : 14;
+
+    ctx.beginPath();
+    ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle   = col + (isHL?'dd':'44');
+    ctx.strokeStyle = col;
+    ctx.lineWidth   = isHL?3:1.5;
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = '#fff';
+    ctx.font      = `${isHL?'bold ':''} ${isHL?12:10}px Segoe UI,sans-serif`;
+    ctx.textAlign = 'center';
+    const label   = n.name.replace(' / ',' /\n');
+    const lines   = label.split('\n');
+    const ty      = y + r + 14;
+    lines.forEach((l,i) => ctx.fillText(l, x, ty + i*13));
+  });
+}
+
+// Click on canvas to set destination
+document.getElementById('station-canvas').addEventListener('click', function(e) {
+  const rect = this.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) / rect.width;
+  const my = (e.clientY - rect.top)  / rect.height;
+  let nearest = null, minDist = 9999;
+  stationMap.nodes.forEach(n => {
+    const d = Math.hypot(n.x - mx, n.y - my);
+    if (d < minDist) { minDist=d; nearest=n; }
+  });
+  if (nearest && minDist < 0.08) {
+    document.getElementById('nav-dest').value = nearest.id;
+    setDestination(nearest.id);
+    drawMap([nearest.id]);
+  }
+});
+
+// ── TTS ───────────────────────────────────────────
+function speak(text) {
+  if (!text) return;
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang='en-US'; u.rate=0.95;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+// Init
+drawMap(null);
+</script>
+{% endblock %}

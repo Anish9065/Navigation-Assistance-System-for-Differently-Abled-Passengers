@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Navigation Assistance System{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"/>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <i class="ti ti-accessible"></i>
+      <span>NavAssist</span>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="/" class="{% if request.path=='/' %}active{% endif %}">
+        <i class="ti ti-home"></i> Dashboard</a></li>
+      <li><a href="/train" class="{% if request.path=='/train' %}active{% endif %}">
+        <i class="ti ti-brain"></i> Train Model</a></li>
+      <li><a href="/detect" class="{% if request.path=='/detect' %}active{% endif %}">
+        <i class="ti ti-eye"></i> Detect</a></li>
+      <li><a href="/navigation" class="{% if request.path=='/navigation' %}active{% endif %}">
+        <i class="ti ti-map-2"></i> Navigation</a></li>
+      <li><a href="/demo" class="{% if request.path=='/demo' %}active{% endif %}">
+        <i class="ti ti-player-play"></i> Demo Mode</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <small>Railway Station</small><br/>
+      <small>Navigation Aid v1.0</small>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="main">
+    <div class="topbar">
+      <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+      <div class="topbar-right">
+        <span class="badge-system"><i class="ti ti-wifi"></i> System Online</span>
+      </div>
+    </div>
+    <div class="content">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

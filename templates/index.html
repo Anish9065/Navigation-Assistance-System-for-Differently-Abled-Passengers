@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Navigation Assistance{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="hero-card">
+  <div class="hero-icon"><i class="ti ti-accessible"></i></div>
+  <div>
+    <h2>Navigation Assistance System</h2>
+    <p>AI-powered guidance for differently-abled passengers at railway stations.<br/>
+       Real-time detection &amp; audio/visual navigation directions.</p>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="grid-3" style="margin-top:1.5rem;">
+  <a href="/train" class="action-card">
+    <i class="ti ti-brain"></i>
+    <h3>Train Model</h3>
+    <p>Upload your dataset and train a custom YOLOv8 model on your railway station data.</p>
+  </a>
+  <a href="/detect" class="action-card">
+    <i class="ti ti-eye-search"></i>
+    <h3>Detect</h3>
+    <p>Run detection on images, videos, or live webcam feed with your trained model.</p>
+  </a>
+  <a href="/navigation" class="action-card">
+    <i class="ti ti-map-pin"></i>
+    <h3>Navigate</h3>
+    <p>Set a destination and get real-time audio+visual guidance for detected passengers.</p>
+  </a>
+</div>
+
+<!-- Model Loader -->
+<div class="card" style="margin-top:1.5rem;">
+  <div class="card-header"><i class="ti ti-cpu"></i> Load Model</div>
+  <div class="card-body">
+    <div class="row-gap">
+      <select id="model-select" class="input-el">
+        <option value="yolov8n.pt">yolov8n.pt (pretrained — no training needed)</option>
+        {% for m in models %}
+        <option value="{{ m }}">{{ m }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-primary" onclick="loadModel()">
+        <i class="ti ti-player-play"></i> Load Model
+      </button>
+    </div>
+    <p id="model-status" class="status-text"></p>
+  </div>
+</div>
+
+<!-- Stats row -->
+<div class="grid-4" style="margin-top:1rem;">
+  <div class="stat-card">
+    <div class="stat-val" id="stat-models">{{ models|length }}</div>
+    <div class="stat-label"><i class="ti ti-file"></i> Saved Models</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-val" id="stat-persons">—</div>
+    <div class="stat-label"><i class="ti ti-users"></i> Last Detection Count</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-val">6</div>
+    <div class="stat-label"><i class="ti ti-tag"></i> Detection Classes</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-val">9</div>
+    <div class="stat-label"><i class="ti ti-map-2"></i> Station Zones</div>
+  </div>
+</div>
+
+<!-- Class legend -->
+<div class="card" style="margin-top:1rem;">
+  <div class="card-header"><i class="ti ti-tags"></i> Detection Classes</div>
+  <div class="card-body">
+    <div class="class-grid">
+      <div class="class-badge" style="border-color:#1a56db;color:#4d7aff"><i class="ti ti-user"></i> Person</div>
+      <div class="class-badge" style="border-color:#ff8c00;color:#ff8c00"><i class="ti ti-wheelchair"></i> Wheelchair User</div>
+      <div class="class-badge" style="border-color:#05b47e;color:#05b47e"><i class="ti ti-eye-off"></i> Blind Person</div>
+      <div class="class-badge" style="border-color:#a78bfa;color:#a78bfa"><i class="ti ti-urgent"></i> Person w/ Crutches</div>
+      <div class="class-badge" style="border-color:#f59e0b;color:#f59e0b"><i class="ti ti-man"></i> Elderly Person</div>
+      <div class="class-badge" style="border-color:#60a5fa;color:#60a5fa"><i class="ti ti-briefcase"></i> Person w/ Luggage</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadModel() {
+  const model = document.getElementById('model-select').value;
+  const el    = document.getElementById('model-status');
+  el.textContent = 'Loading…';
+  el.className   = 'status-text';
+  const res  = await fetch('/api/load_model', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({model})
+  });
+  const data = await res.json();
+  el.textContent = data.message;
+  el.className   = 'status-text ' + (data.success ? 'ok' : 'err');
+}
+</script>
+{% endblock %}

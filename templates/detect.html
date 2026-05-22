@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% block title %}Detect — Navigation Assistance{% endblock %}
+{% block page_title %}Detection{% endblock %}
+
+{% block content %}
+<!-- Mode Tabs -->
+<div class="tab-row">
+  <button class="tab active" onclick="switchTab('image', this)"><i class="ti ti-photo"></i> Image</button>
+  <button class="tab"        onclick="switchTab('video', this)"><i class="ti ti-video"></i> Video</button>
+  <button class="tab"        onclick="switchTab('live',  this)"><i class="ti ti-live-view"></i> Live Camera</button>
+</div>
+
+<!-- Model select bar -->
+<div class="card">
+  <div class="card-body" style="padding:12px 16px;">
+    <div class="row-gap">
+      <label class="form-label" style="margin:0;white-space:nowrap">Active model:</label>
+      <select id="model-sel" class="input-el">
+        <option value="yolov8n.pt">yolov8n.pt (pretrained)</option>
+        {% for m in models %}
+        <option value="{{ m }}">{{ m }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-secondary" onclick="loadModelDetect()"><i class="ti ti-cpu"></i> Load</button>
+      <span id="model-msg" class="status-text" style="margin:0"></span>
+
+      <label class="form-label" style="margin:0 0 0 12px;white-space:nowrap">Conf:</label>
+      <input type="range" id="conf-slider" min="10" max="90" value="40" step="5"
+             style="width:90px" oninput="document.getElementById('conf-val').textContent=this.value+'%'"/>
+      <span id="conf-val" style="font-size:13px;color:#8891a8;min-width:36px">40%</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── IMAGE TAB ─────────────────────────────────── -->
+<div id="tab-image" class="tab-panel">
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><i class="ti ti-upload"></i> Upload Image</div>
+      <div class="card-body">
+        <div class="drop-zone" id="img-drop" onclick="document.getElementById('img-input').click()">
+          <i class="ti ti-photo-up"></i>
+          <p>Click or drag an image here</p>
+          <small>.jpg .png .bmp .webp</small>
+        </div>
+        <input type="file" id="img-input" accept="image/*" hidden onchange="previewImage(this)"/>
+        <img id="img-preview" class="preview-img hidden" alt="preview"/>
+        <button class="btn btn-primary mt" onclick="detectImage()" id="btn-detect-img">
+          <i class="ti ti-eye-search"></i> Detect
+        </button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><i class="ti ti-checklist"></i> Results</div>
+      <div class="card-body">
+        <img id="img-result" class="preview-img hidden" alt="result"/>
+        <div id="img-detections" class="det-list"></div>
+        <div id="img-directions" class="dir-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── VIDEO TAB ─────────────────────────────────── -->
+<div id="tab-video" class="tab-panel hidden">
+  <div class="card">
+    <div class="card-header"><i class="ti ti-video-plus"></i> Upload Video</div>
+    <div class="card-body">
+      <div class="drop-zone" onclick="document.getElementById('vid-input').click()">
+        <i class="ti ti-video-plus"></i>
+        <p>Click to select a video</p>
+        <small>.mp4 .avi .mov .mkv</small>
+      </div>
+      <input type="file" id="vid-input" accept="video/*" hidden onchange="previewVideo(this)"/>
+      <video id="vid-preview" class="preview-img hidden" controls></video>
+      <div class="row-gap mt">
+        <button class="btn btn-primary" onclick="detectVideo()" id="btn-detect-vid">
+          <i class="ti ti-eye-search"></i> Process Video
+        </button>
+      </div>
+      <div id="vid-progress" class="status-text"></div>
+      <video id="vid-result" class="preview-img hidden" controls></video>
+    </div>
+  </div>
+</div>
+
+<!-- ── LIVE TAB ───────────────────────────────────── -->
+<div id="tab-live" class="tab-panel hidden">
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><i class="ti ti-live-view"></i> Live Camera</div>
+      <div class="card-body">
+        <div class="live-wrap">
+          <img id="live-feed" class="live-feed hidden" src="" alt="live"/>
+          <div id="live-placeholder" class="live-placeholder">
+            <i class="ti ti-camera-off"></i>
+            <p>Camera not started</p>
+          </div>
+        </div>
+        <div class="row-gap mt">
+          <button class="btn btn-primary" id="btn-live-start" onclick="startLive()">
+            <i class="ti ti-camera"></i> Start
+          </button>
+          <button class="btn btn-danger"  id="btn-live-stop"  onclick="stopLive()" disabled>
+            <i class="ti ti-player-stop"></i> Stop
+          </button>
+        </div>
+        <div class="row-gap mt">
+          <label class="form-label" style="margin:0">Destination:</label>
+          <select id="live-dest" class="input-el" onchange="updateDest(this.value)">
+            <option value="platform_1">Platform 1</option>
+            <option value="platform_2">Platform 2</option>
+            <option value="ticket_counter">Ticket Counter</option>
+            <option value="restroom">Restroom</option>
+            <option value="elevator">Elevator</option>
+            <option value="waiting_area">Waiting Area</option>
+            <option value="exit">Exit</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><i class="ti ti-map-pin"></i> Live Directions</div>
+      <div class="card-body">
+        <div id="live-direction-display" class="big-direction">
+          <i class="ti ti-map-pin" style="font-size:40px;opacity:0.3"></i>
+          <p>Start camera and select a destination</p>
+        </div>
+        <div id="live-det-list" class="det-list mt"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ── Tab switching ─────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  btn.classList.add('active');
+  if (name !== 'live') stopLive();
+}
+
+// ── Model load ────────────────────────────────────
+async function loadModelDetect() {
+  const model = document.getElementById('model-sel').value;
+  const el    = document.getElementById('model-msg');
+  el.textContent = 'Loading…'; el.className = 'status-text';
+  const res = await fetch('/api/load_model', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({model})
+  });
+  const d = await res.json();
+  el.textContent = d.message; el.className = 'status-text ' + (d.success?'ok':'err');
+}
+
+// ── Image ─────────────────────────────────────────
+function previewImage(inp) {
+  const f = inp.files[0]; if (!f) return;
+  const p = document.getElementById('img-preview');
+  p.src = URL.createObjectURL(f); p.classList.remove('hidden');
+  document.getElementById('img-result').classList.add('hidden');
+  document.getElementById('img-detections').innerHTML = '';
+  document.getElementById('img-directions').innerHTML = '';
+}
+
+async function detectImage() {
+  const f = document.getElementById('img-input').files[0];
+  if (!f) { alert('Upload an image first.'); return; }
+  const fd = new FormData(); fd.append('image', f);
+  fd.append('conf', document.getElementById('conf-slider').value / 100);
+  document.getElementById('btn-detect-img').textContent = 'Detecting…';
+  const res  = await fetch('/api/detect/image', {method:'POST', body:fd});
+  const data = await res.json();
+  document.getElementById('btn-detect-img').innerHTML = '<i class="ti ti-eye-search"></i> Detect';
+
+  if (!data.success) { alert(data.message); return; }
+
+  const ri = document.getElementById('img-result');
+  ri.src = data.result_image + '?t=' + Date.now();
+  ri.classList.remove('hidden');
+
+  const dl = document.getElementById('img-detections');
+  dl.innerHTML = '<div class="det-header">Detections (' + data.count + ')</div>' +
+    (data.detections || []).map(d =>
+      `<div class="det-item"><span class="det-name">${d.class_name}</span>
+       <span class="det-conf">${Math.round(d.confidence*100)}%</span></div>`
+    ).join('');
+
+  const dirs = document.getElementById('img-directions');
+  dirs.innerHTML = '<div class="det-header mt">Directions</div>' +
+    (data.directions || []).map(d =>
+      `<div class="dir-item"><i class="ti ti-arrow-right"></i>
+       <span>[${d.zone}] ${d.instruction}</span></div>`
+    ).join('');
+
+  // TTS
+  if (data.directions && data.directions[0]) speak(data.directions[0].instruction);
+}
+
+// ── Video ─────────────────────────────────────────
+function previewVideo(inp) {
+  const f = inp.files[0]; if (!f) return;
+  const v = document.getElementById('vid-preview');
+  v.src = URL.createObjectURL(f); v.classList.remove('hidden');
+}
+
+async function detectVideo() {
+  const f = document.getElementById('vid-input').files[0];
+  if (!f) { alert('Upload a video first.'); return; }
+  const fd = new FormData(); fd.append('video', f);
+  const el = document.getElementById('vid-progress');
+  el.textContent = 'Processing video… this may take a while.';
+  document.getElementById('btn-detect-vid').disabled = true;
+  const res  = await fetch('/api/detect/video', {method:'POST', body:fd});
+  const data = await res.json();
+  document.getElementById('btn-detect-vid').disabled = false;
+  if (!data.success) { el.textContent = data.message; return; }
+  el.textContent = `Done! ${data.total_frames} frames processed.`;
+  const rv = document.getElementById('vid-result');
+  rv.src = data.result_video + '?t=' + Date.now();
+  rv.classList.remove('hidden');
+}
+
+// ── Live ──────────────────────────────────────────
+let liveActive = false;
+let currentDest = 'platform_1';
+
+function startLive() {
+  liveActive = true;
+  const feed = document.getElementById('live-feed');
+  feed.src = '/video_feed?destination=' + currentDest + '&t=' + Date.now();
+  feed.classList.remove('hidden');
+  document.getElementById('live-placeholder').classList.add('hidden');
+  document.getElementById('btn-live-start').disabled = true;
+  document.getElementById('btn-live-stop').disabled  = false;
+}
+
+async function stopLive() {
+  liveActive = false;
+  const feed = document.getElementById('live-feed');
+  feed.src = ''; feed.classList.add('hidden');
+  document.getElementById('live-placeholder').classList.remove('hidden');
+  document.getElementById('btn-live-start').disabled = false;
+  document.getElementById('btn-live-stop').disabled  = true;
+  await fetch('/api/camera/stop', {method:'POST'});
+}
+
+function updateDest(val) {
+  currentDest = val;
+  if (liveActive) { startLive(); }
+  speak('Setting destination to ' + val.replace(/_/g,' '));
+}
+
+// ── TTS (browser Web Speech API) ──────────────────
+function speak(text) {
+  if (!text) return;
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = 0.95;
+    window.speechSynthesis.speak(u);
+  }
+}
+</script>
+{% endblock %}

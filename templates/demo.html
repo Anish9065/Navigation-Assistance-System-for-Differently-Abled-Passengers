@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+{% block title %}Demo — Navigation Assistance{% endblock %}
+{% block page_title %}Demo Mode{% endblock %}
+
+{% block content %}
+
+<div class="hero-card" style="background:linear-gradient(135deg,#1a3a1e,#1a1d27);border-color:rgba(5,180,126,0.4)">
+  <div class="hero-icon" style="background:var(--success)"><i class="ti ti-player-play"></i></div>
+  <div>
+    <h2>Demo Mode — No Training Required</h2>
+    <p>Uses the <strong>YOLOv8n pretrained model</strong> (COCO 80 classes) for immediate detection.<br/>
+       Person detection works instantly. Wheelchair/mobility classes activate after custom training.</p>
+  </div>
+</div>
+
+<!-- Quick Start Cards -->
+<div class="grid-3" style="margin-top:1.2rem">
+  <div class="action-card" style="border-color:rgba(5,180,126,0.3)">
+    <i class="ti ti-camera" style="color:var(--success)"></i>
+    <h3>Live Camera Demo</h3>
+    <p>Start your webcam instantly with pretrained YOLOv8. Detects persons in real-time with station navigation zones.</p>
+    <button class="btn btn-primary mt" style="background:var(--success);border-color:var(--success)" onclick="startLiveDemo()">
+      <i class="ti ti-camera"></i> Start Live Demo
+    </button>
+  </div>
+  <div class="action-card" style="border-color:rgba(26,86,219,0.3)">
+    <i class="ti ti-photo" style="color:var(--primary)"></i>
+    <h3>Image Demo</h3>
+    <p>Upload any photo. The system detects persons and shows navigation directions overlaid on the image.</p>
+    <button class="btn btn-primary mt" onclick="document.getElementById('demo-img-input').click()">
+      <i class="ti ti-upload"></i> Upload Image
+    </button>
+    <input type="file" id="demo-img-input" accept="image/*" hidden onchange="runImageDemo(this)"/>
+  </div>
+  <div class="action-card" style="border-color:rgba(108,71,255,0.3)">
+    <i class="ti ti-sparkles" style="color:#a78bfa"></i>
+    <h3>Synthetic Demo</h3>
+    <p>No camera needed. Generates animated passengers in a simulated railway station — great for testing.</p>
+    <button class="btn mt" style="background:#6c47ff22;border-color:#6c47ff55;color:#a78bfa" onclick="runSyntheticDemo()">
+      <i class="ti ti-sparkles"></i> Run Synthetic Demo
+    </button>
+  </div>
+</div>
+
+<!-- Live Demo Panel -->
+<div class="card mt" id="live-panel" style="display:none">
+  <div class="card-header"><i class="ti ti-live-view"></i> Live Camera — Demo</div>
+  <div class="card-body">
+    <div class="grid-2">
+      <div>
+        <div class="live-wrap">
+          <img id="demo-feed" class="live-feed" src="" alt="demo feed"/>
+          <div id="demo-placeholder" class="live-placeholder">
+            <i class="ti ti-camera-off"></i><p>Loading…</p>
+          </div>
+        </div>
+        <div class="row-gap mt">
+          <button class="btn btn-danger" onclick="stopLiveDemo()"><i class="ti ti-player-stop"></i> Stop</button>
+          <select id="demo-dest" class="input-el" onchange="changeDemoDest(this.value)">
+            <option value="platform_1">Platform 1</option>
+            <option value="platform_2">Platform 2</option>
+            <option value="ticket_counter">Ticket Counter</option>
+            <option value="restroom">Restroom</option>
+            <option value="elevator">Elevator</option>
+            <option value="waiting_area">Waiting Area</option>
+            <option value="exit">Exit</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <div class="card-header" style="border:none;padding:0 0 10px 0;font-size:13px">
+          <i class="ti ti-info-circle"></i> Demo Info
+        </div>
+        <div class="demo-info-list">
+          <div class="demo-info-item">
+            <i class="ti ti-circle-check" style="color:var(--success)"></i>
+            <span>YOLOv8n pretrained — detects 80 COCO classes</span>
+          </div>
+          <div class="demo-info-item">
+            <i class="ti ti-circle-check" style="color:var(--success)"></i>
+            <span>Person detection works out of the box</span>
+          </div>
+          <div class="demo-info-item">
+            <i class="ti ti-circle-check" style="color:var(--success)"></i>
+            <span>Station zones overlay with navigation arrows</span>
+          </div>
+          <div class="demo-info-item">
+            <i class="ti ti-circle-check" style="color:var(--success)"></i>
+            <span>Audio guidance via browser Speech API</span>
+          </div>
+          <div class="demo-info-item">
+            <i class="ti ti-alert-circle" style="color:var(--warn)"></i>
+            <span>Wheelchair/blind/crutch classes need custom training</span>
+          </div>
+        </div>
+
+        <div class="card-header" style="border:none;padding:12px 0 8px 0;font-size:13px">
+          <i class="ti ti-speakerphone"></i> Current Direction
+        </div>
+        <div id="current-direction" class="big-direction" style="min-height:80px;background:var(--bg3);border-radius:10px;padding:16px">
+          <i class="ti ti-map-pin" style="font-size:28px;opacity:0.4"></i>
+          <p style="font-size:13px">Waiting for detection…</p>
+        </div>
+        <button class="btn mt" style="width:100%" onclick="speakCurrent()">
+          <i class="ti ti-volume"></i> Announce Direction
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Image Result Panel -->
+<div class="card mt" id="img-result-panel" style="display:none">
+  <div class="card-header"><i class="ti ti-photo-check"></i> Image Detection Result</div>
+  <div class="card-body">
+    <div class="grid-2">
+      <img id="demo-img-result" class="preview-img" src="" alt="result"/>
+      <div>
+        <div class="det-header">Detections</div>
+        <div id="demo-img-dets" class="det-list"></div>
+        <div class="det-header mt">Navigation Directions</div>
+        <div id="demo-img-dirs" class="dir-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Dataset Download Panel -->
+<div class="card mt">
+  <div class="card-header"><i class="ti ti-download"></i> Download Dataset for Training</div>
+  <div class="card-body">
+    <div class="grid-2">
+      <div>
+        <h3 style="font-size:14px;margin-bottom:10px">Option A — Synthetic Dataset</h3>
+        <p class="hint-text" style="margin-bottom:10px">
+          Generates <strong>200 train + 50 val</strong> synthetic station images with 6 classes.
+          Good for testing the full training pipeline before using real data.
+        </p>
+        <div class="row-gap">
+          <input type="number" id="syn-train" class="input-el" value="200" min="50" max="2000" style="width:90px" placeholder="Train"/>
+          <input type="number" id="syn-val"   class="input-el" value="50"  min="10" max="500"  style="width:80px" placeholder="Val"/>
+          <button class="btn btn-primary" onclick="downloadSynthetic()">
+            <i class="ti ti-sparkles"></i> Generate
+          </button>
+        </div>
+        <div id="syn-status" class="status-text"></div>
+      </div>
+
+      <div>
+        <h3 style="font-size:14px;margin-bottom:10px">Option B — Roboflow Public Dataset</h3>
+        <p class="hint-text" style="margin-bottom:10px">
+          Paste your free <a href="https://app.roboflow.com" target="_blank" style="color:var(--primary)">Roboflow API key</a>
+          and dataset details to auto-download a real annotated dataset.
+        </p>
+        <input id="rf-key"       class="input-el mb" type="text"   placeholder="Roboflow API Key"/>
+        <input id="rf-workspace" class="input-el mb" type="text"   placeholder="Workspace name"/>
+        <input id="rf-project"   class="input-el mb" type="text"   placeholder="Project name"/>
+        <input id="rf-version"   class="input-el mb" type="number" placeholder="Version" value="1" style="width:100px"/>
+        <button class="btn btn-primary" onclick="downloadRoboflow()">
+          <i class="ti ti-cloud-download"></i> Download
+        </button>
+        <div id="rf-status" class="status-text"></div>
+      </div>
+    </div>
+
+    <div class="info-box mt">
+      <strong><i class="ti ti-bulb"></i> After downloading dataset:</strong>
+      Go to the <a href="/train" style="color:var(--primary)">Train page</a> →
+      select base model → click Start Training → model saves to <code>models/</code> automatically.
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentDirText = '';
+
+// ── Live Demo ─────────────────────────────────────
+async function startLiveDemo() {
+  // Load pretrained model first
+  const res  = await fetch('/api/load_model', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({model:'yolov8n.pt'})
+  });
+  const data = await res.json();
+  if (!data.success) { alert('Could not load model: ' + data.message); return; }
+
+  document.getElementById('live-panel').style.display = 'block';
+  document.getElementById('live-panel').scrollIntoView({behavior:'smooth'});
+
+  const dest = document.getElementById('demo-dest').value;
+  const feed = document.getElementById('demo-feed');
+  feed.src   = '/video_feed?destination=' + dest + '&t=' + Date.now();
+  document.getElementById('demo-placeholder').style.display = 'none';
+
+  speak('Demo started. Destination: ' + dest.replace(/_/g,' '));
+}
+
+async function stopLiveDemo() {
+  document.getElementById('demo-feed').src = '';
+  document.getElementById('demo-placeholder').style.display = 'flex';
+  await fetch('/api/camera/stop', {method:'POST'});
+}
+
+function changeDemoDest(val) {
+  const feed = document.getElementById('demo-feed');
+  if (feed.src.includes('video_feed')) {
+    feed.src = '/video_feed?destination=' + val + '&t=' + Date.now();
+  }
+  speak('Destination changed to ' + val.replace(/_/g,' '));
+}
+
+// ── Image Demo ────────────────────────────────────
+async function runImageDemo(inp) {
+  const f = inp.files[0]; if (!f) return;
+
+  // Load model silently
+  await fetch('/api/load_model', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({model:'yolov8n.pt'})
+  });
+
+  const fd = new FormData(); fd.append('image', f);
+  const res  = await fetch('/api/detect/image', {method:'POST', body:fd});
+  const data = await res.json();
+  if (!data.success) { alert(data.message); return; }
+
+  document.getElementById('img-result-panel').style.display = 'block';
+  document.getElementById('img-result-panel').scrollIntoView({behavior:'smooth'});
+
+  document.getElementById('demo-img-result').src = data.result_image + '?t=' + Date.now();
+
+  document.getElementById('demo-img-dets').innerHTML =
+    (data.detections||[]).map(d =>
+      `<div class="det-item">
+         <span class="det-name">${d.class_name}</span>
+         <span class="det-conf">${Math.round(d.confidence*100)}%</span>
+       </div>`).join('') || '<p class="hint-text">No detections</p>';
+
+  document.getElementById('demo-img-dirs').innerHTML =
+    (data.directions||[]).map(d =>
+      `<div class="dir-item"><i class="ti ti-arrow-right"></i>
+       <span>[${d.zone}] ${d.instruction}</span></div>`).join('') || '';
+
+  if (data.directions && data.directions[0]) speak(data.directions[0].instruction);
+}
+
+// ── Synthetic Demo ────────────────────────────────
+function runSyntheticDemo() {
+  alert('Synthetic demo runs as a desktop window.\n\nOpen a terminal and run:\n  python demo.py --no-camera\n\nControls:\n  D = change destination\n  S = save snapshot\n  Z = toggle zones\n  Q = quit');
+}
+
+// ── Dataset Download ──────────────────────────────
+async function downloadSynthetic() {
+  const n_train = document.getElementById('syn-train').value;
+  const n_val   = document.getElementById('syn-val').value;
+  const el      = document.getElementById('syn-status');
+  el.textContent = 'Generating…'; el.className = 'status-text';
+  const res  = await fetch('/api/dataset/synthetic', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({n_train:+n_train, n_val:+n_val})
+  });
+  const data = await res.json();
+  el.textContent = data.message; el.className = 'status-text ' + (data.success?'ok':'err');
+}
+
+async function downloadRoboflow() {
+  const payload = {
+    api_key:   document.getElementById('rf-key').value,
+    workspace: document.getElementById('rf-workspace').value,
+    project:   document.getElementById('rf-project').value,
+    version:   +document.getElementById('rf-version').value,
+  };
+  if (!payload.api_key || !payload.workspace || !payload.project) {
+    alert('Please fill in all Roboflow fields.'); return;
+  }
+  const el = document.getElementById('rf-status');
+  el.textContent = 'Downloading from Roboflow…'; el.className = 'status-text';
+  const res  = await fetch('/api/dataset/roboflow', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  el.textContent = data.message; el.className = 'status-text ' + (data.success?'ok':'err');
+}
+
+function speakCurrent() { if (currentDirText) speak(currentDirText); }
+
+function speak(text) {
+  if (!text || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.92;
+  window.speechSynthesis.speak(u);
+  currentDirText = text;
+  const el = document.getElementById('current-direction');
+  if (el) el.innerHTML = `<i class="ti ti-volume" style="font-size:24px;color:var(--success)"></i>
+                           <p style="font-size:13px;margin-top:6px">${text}</p>`;
+}
+</script>
+{% endblock %}

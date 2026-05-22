@@ -1,0 +1,2877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Navigation Assistance System — Questions & Answers</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --primary: #2563eb;
+    --primary-light: #dbeafe;
+    --accent: #7c3aed;
+    --green: #059669;
+    --green-light: #d1fae5;
+    --orange: #d97706;
+    --orange-light: #fef3c7;
+    --red: #dc2626;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--gray-800);
+    line-height: 1.7;
+    background: #fff;
+    font-size: 11pt;
+  }
+
+  @media print {
+    body { font-size: 10pt; }
+    .page-break { page-break-before: always; }
+    .no-print { display: none; }
+    .section { page-break-inside: avoid; }
+    .qa-item { page-break-inside: avoid; }
+  }
+
+  /* ── Cover Page ─────────────────────────── */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 50%, #1e1b4b 100%);
+    color: #fff;
+    text-align: center;
+    padding: 40px;
+  }
+  .cover-icon { font-size: 64px; margin-bottom: 20px; }
+  .cover h1 {
+    font-size: 32pt;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .cover h2 {
+    font-size: 16pt;
+    font-weight: 500;
+    color: #94a3b8;
+    margin-bottom: 30px;
+  }
+  .cover .subtitle {
+    font-size: 11pt;
+    color: #64748b;
+    max-width: 600px;
+  }
+  .cover .tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 30px;
+  }
+  .cover .tech-tag {
+    background: rgba(96,165,250,0.15);
+    border: 1px solid rgba(96,165,250,0.3);
+    color: #93c5fd;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 10pt;
+    font-weight: 500;
+  }
+
+  /* ── Container ──────────────────────────── */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 30px;
+  }
+
+  /* ── TOC ─────────────────────────────────── */
+  .toc {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 30px 35px;
+    margin-bottom: 40px;
+  }
+  .toc h2 {
+    font-size: 18pt;
+    color: var(--primary);
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--primary-light);
+    padding-bottom: 8px;
+  }
+  .toc ol {
+    list-style: none;
+    counter-reset: toc-counter;
+  }
+  .toc ol li {
+    counter-increment: toc-counter;
+    padding: 6px 0;
+    font-weight: 500;
+    color: var(--gray-700);
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .toc ol li::before {
+    content: counter(toc-counter) ".";
+    color: var(--primary);
+    font-weight: 700;
+    margin-right: 10px;
+    display: inline-block;
+    width: 24px;
+  }
+  .toc .q-count {
+    float: right;
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 1px 10px;
+    border-radius: 12px;
+    font-size: 9pt;
+    font-weight: 600;
+  }
+
+  /* ── Section Headers ────────────────────── */
+  .section-header {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff;
+    padding: 18px 28px;
+    border-radius: 10px;
+    margin: 50px 0 24px 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .section-header .sec-num {
+    background: rgba(255,255,255,0.2);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 14pt;
+    flex-shrink: 0;
+  }
+  .section-header h2 {
+    font-size: 15pt;
+    font-weight: 700;
+  }
+
+  /* ── Q&A Items ──────────────────────────── */
+  .qa-item {
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .question {
+    background: var(--gray-50);
+    padding: 14px 20px;
+    font-weight: 600;
+    color: var(--gray-900);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .q-num {
+    background: var(--primary);
+    color: #fff;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9pt;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .answer {
+    padding: 16px 20px 16px 56px;
+    color: var(--gray-700);
+  }
+  .answer p { margin-bottom: 8px; }
+  .answer ul, .answer ol {
+    margin: 8px 0 8px 20px;
+  }
+  .answer li { margin-bottom: 4px; }
+
+  .answer code {
+    background: #f1f5f9;
+    color: #be185d;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5pt;
+  }
+
+  .answer pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 14px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9pt;
+    line-height: 1.6;
+    margin: 10px 0;
+  }
+
+  .answer table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 10pt;
+  }
+  .answer th {
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 600;
+    border: 1px solid var(--gray-200);
+  }
+  .answer td {
+    padding: 7px 12px;
+    border: 1px solid var(--gray-200);
+  }
+  .answer tr:nth-child(even) td { background: var(--gray-50); }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 8pt;
+    font-weight: 600;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .tag-theory { background: #dbeafe; color: #1d4ed8; }
+  .tag-code { background: #d1fae5; color: #065f46; }
+  .tag-viva { background: #fef3c7; color: #92400e; }
+  .tag-practical { background: #fce7f3; color: #9d174d; }
+
+  .highlight-box {
+    background: #eff6ff;
+    border-left: 4px solid var(--primary);
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 10px 0;
+  }
+
+  /* ── Print Button ───────────────────────── */
+  .print-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #fff;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 50px;
+    font-size: 12pt;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(37,99,235,0.4);
+    z-index: 1000;
+    transition: transform 0.2s;
+  }
+  .print-btn:hover { transform: scale(1.05); }
+
+  .footer {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--gray-600);
+    font-size: 9pt;
+    border-top: 1px solid var(--gray-200);
+    margin-top: 60px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Print Button -->
+<button class="print-btn no-print" onclick="window.print()">📄 Save as PDF</button>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- COVER PAGE -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-icon">🚉</div>
+  <h1>Navigation Assistance System<br>for Differently-Abled Passengers</h1>
+  <h2>Complete Questions & Answers</h2>
+  <p class="subtitle">
+    Comprehensive Q&A covering project overview, YOLOv8 object detection, Flask web development,
+    BFS graph navigation, OpenCV visualization, TTS audio guide, dataset preparation, and code-level viva questions.
+  </p>
+  <div class="tech-tags">
+    <span class="tech-tag">Python</span>
+    <span class="tech-tag">YOLOv8</span>
+    <span class="tech-tag">Flask</span>
+    <span class="tech-tag">OpenCV</span>
+    <span class="tech-tag">BFS Algorithm</span>
+    <span class="tech-tag">pyttsx3 / gTTS</span>
+    <span class="tech-tag">PyTorch</span>
+    <span class="tech-tag">PIL / Pillow</span>
+    <span class="tech-tag">Threading</span>
+    <span class="tech-tag">REST API</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- TABLE OF CONTENTS -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="container">
+
+<div class="toc page-break">
+  <h2>📑 Table of Contents</h2>
+  <ol>
+    <li>Project Overview & Architecture <span class="q-count">15 Qs</span></li>
+    <li>YOLOv8 & Object Detection <span class="q-count">20 Qs</span></li>
+    <li>Flask Web Application & REST API <span class="q-count">18 Qs</span></li>
+    <li>BFS Navigation & Graph Routing <span class="q-count">15 Qs</span></li>
+    <li>OpenCV & Visualization <span class="q-count">12 Qs</span></li>
+    <li>Audio Guide & Text-to-Speech <span class="q-count">10 Qs</span></li>
+    <li>Dataset Preparation & Synthetic Data <span class="q-count">15 Qs</span></li>
+    <li>Training Pipeline <span class="q-count">12 Qs</span></li>
+    <li>Configuration & Settings <span class="q-count">8 Qs</span></li>
+    <li>Python Concepts Used <span class="q-count">12 Qs</span></li>
+    <li>Code-Level Viva Questions <span class="q-count">20 Qs</span></li>
+    <li>Real-World & Application Questions <span class="q-count">10 Qs</span></li>
+  </ol>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 1: PROJECT OVERVIEW -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<div class="section-header page-break"><div class="sec-num">1</div><h2>Project Overview & Architecture</h2></div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">1</span> What is the Navigation Assistance System? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p>The Navigation Assistance System is an <strong>AI-powered application</strong> designed to help differently-abled passengers navigate railway stations. It uses <strong>YOLOv8 object detection</strong> to detect passengers via camera feeds and provides <strong>real-time audio and visual guidance</strong> to help them reach their destination within the station.</p>
+    <p>The system identifies 6 classes of passengers: person, wheelchair user, blind person, person with crutches, elderly person, and person with luggage. It maps detected positions to predefined station zones and uses <strong>BFS (Breadth-First Search)</strong> to compute the shortest route to the destination.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">2</span> What are the main technologies used in this project? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>Technology</th><th>Purpose</th></tr>
+      <tr><td>Python 3.8+</td><td>Core programming language</td></tr>
+      <tr><td>YOLOv8 (Ultralytics)</td><td>Real-time object detection</td></tr>
+      <tr><td>Flask</td><td>Web application framework</td></tr>
+      <tr><td>OpenCV (cv2)</td><td>Image/video processing & visualization</td></tr>
+      <tr><td>PyTorch</td><td>Deep learning backend for YOLO</td></tr>
+      <tr><td>pyttsx3 / gTTS</td><td>Text-to-Speech (offline / online)</td></tr>
+      <tr><td>PIL (Pillow)</td><td>Synthetic image generation</td></tr>
+      <tr><td>NumPy</td><td>Numerical array operations</td></tr>
+      <tr><td>Threading</td><td>Background tasks (training, audio, camera)</td></tr>
+      <tr><td>BFS Algorithm</td><td>Shortest path navigation</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">3</span> Explain the project directory structure. <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <pre>navigation-assistance/
+├── app.py                  # Flask web application (main entry)
+├── demo.py                 # Standalone demo (pretrained model)
+├── train.py                # CLI training script
+├── detect.py               # CLI detection (image/video/live)
+├── download_dataset.py     # Dataset download/generation
+├── prepare_dataset.py      # Dataset organiser & verifier
+├── gen_synthetic.py        # Synthetic dataset generator
+├── config/
+│   ├── settings.py         # Zone layout, class colors, thresholds
+│   └── dataset.yaml        # YOLO dataset configuration
+├── navigation/
+│   ├── navigator.py        # BFS graph routing (9 zones)
+│   └── audio_guide.py      # TTS audio announcements
+├── utils/
+│   ├── detector.py         # YOLOv8 inference wrapper
+│   └── visualization.py    # Bounding boxes, zone overlay, arrows
+├── templates/              # Jinja2 HTML templates
+├── static/                 # CSS, JS, uploads
+├── models/                 # Saved .pt model weights
+└── data/dataset/           # Training images & labels</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">4</span> What are the different modes of running this application? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p>The system can be run in <strong>3 main ways</strong>:</p>
+    <ol>
+      <li><strong>Demo Mode</strong> (<code>python demo.py</code>) — Instant demo using pretrained YOLOv8n. Supports live webcam, video, image, or synthetic animated demo (<code>--no-camera</code>).</li>
+      <li><strong>Web App</strong> (<code>python app.py</code>) — Full Flask web UI at <code>http://127.0.0.1:5000</code> with pages for Dashboard, Demo, Train, Detect, and Navigation.</li>
+      <li><strong>CLI Detection</strong> (<code>python detect.py</code>) — Command-line detection on images, videos, or live camera with optional audio guidance.</li>
+    </ol>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">5</span> What are the 6 detection classes and why were they chosen? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>ID</th><th>Class Name</th><th>Color (BGR)</th><th>Purpose</th></tr>
+      <tr><td>0</td><td>person</td><td>Blue (219,86,26)</td><td>General passenger</td></tr>
+      <tr><td>1</td><td>wheelchair_user</td><td>Orange (0,140,255)</td><td>Mobility-impaired passenger in wheelchair</td></tr>
+      <tr><td>2</td><td>blind_person</td><td>Green (0,200,100)</td><td>Visually impaired passenger</td></tr>
+      <tr><td>3</td><td>person_with_crutches</td><td>Purple (255,100,0)</td><td>Passenger with walking aids</td></tr>
+      <tr><td>4</td><td>elderly_person</td><td>Yellow (180,0,255)</td><td>Senior citizen passenger</td></tr>
+      <tr><td>5</td><td>person_with_luggage</td><td>Cyan (0,200,200)</td><td>Passenger carrying bags/luggage</td></tr>
+    </table>
+    <p>These classes were chosen to cover the primary categories of differently-abled and special-needs passengers at railway stations who need navigation assistance.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">6</span> What are the 9 station zones defined in the system? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p>The station layout is divided into <strong>9 zones</strong>, each defined as fractional coordinates (x1, y1, x2, y2) of the video frame:</p>
+    <ol>
+      <li><strong>Entrance</strong> (0.30, 0.00, 0.70, 0.20)</li>
+      <li><strong>Main Hall</strong> (0.20, 0.20, 0.80, 0.60)</li>
+      <li><strong>Ticket Counter</strong> (0.70, 0.00, 1.00, 0.40)</li>
+      <li><strong>Platform 1</strong> (0.00, 0.40, 0.35, 1.00)</li>
+      <li><strong>Platform 2</strong> (0.65, 0.40, 1.00, 1.00)</li>
+      <li><strong>Restroom</strong> (0.00, 0.00, 0.30, 0.40)</li>
+      <li><strong>Elevator</strong> (0.40, 0.55, 0.60, 0.80)</li>
+      <li><strong>Waiting Area</strong> (0.20, 0.55, 0.80, 0.80)</li>
+      <li><strong>Exit</strong> (0.30, 0.80, 0.70, 1.00)</li>
+    </ol>
+    <p>These fractional coordinates are multiplied by frame width and height to map pixel positions to zones.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">7</span> Explain the overall data flow of the system from camera input to audio output. <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <ol>
+      <li><strong>Camera Capture:</strong> OpenCV captures video frames from webcam or video file.</li>
+      <li><strong>Object Detection:</strong> Each frame is passed to YOLOv8 model for inference → returns bounding boxes, class IDs, confidence scores.</li>
+      <li><strong>Result Formatting:</strong> Raw YOLO results are converted to structured dictionaries with class name, confidence, bbox coordinates, and center point.</li>
+      <li><strong>Zone Mapping:</strong> The center (cx, cy) of each detection is normalized to (fx, fy) and matched against predefined zone boundaries.</li>
+      <li><strong>Route Computation:</strong> BFS algorithm computes shortest path from detected zone to destination zone.</li>
+      <li><strong>Visualization:</strong> Annotated frame is drawn with bounding boxes, zone overlays, navigation arrows, and HUD.</li>
+      <li><strong>Audio Guide:</strong> The first step instruction is spoken via pyttsx3 (offline) or gTTS (online fallback) with debounce to avoid repetition.</li>
+      <li><strong>Output:</strong> Annotated frame displayed via OpenCV window or streamed as MJPEG to browser.</li>
+    </ol>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">8</span> What is the role of <code>requirements.txt</code>? List key dependencies. <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p><code>requirements.txt</code> lists all Python packages needed. Key dependencies:</p>
+    <ul>
+      <li><code>flask>=2.3.0</code> — Web framework</li>
+      <li><code>ultralytics>=8.0.0</code> — YOLOv8 library</li>
+      <li><code>opencv-python>=4.8.0</code> — Computer vision</li>
+      <li><code>torch>=2.0.0</code> & <code>torchvision>=0.15.0</code> — Deep learning backend</li>
+      <li><code>pyttsx3>=2.90</code> — Offline text-to-speech</li>
+      <li><code>gtts>=2.3.0</code> — Google TTS (online fallback)</li>
+      <li><code>Pillow>=9.0.0</code> — Image generation</li>
+      <li><code>roboflow>=1.1.0</code> — Dataset download from Roboflow</li>
+    </ul>
+    <p>Install with: <code>pip install -r requirements.txt</code></p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">9</span> How does the system handle the case when no model is loaded? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p>The <code>Detector</code> class has an <code>is_loaded()</code> method that checks if <code>self.model is not None</code>.</p>
+    <ul>
+      <li>In <strong>app.py</strong> (live stream): If model is not loaded, the raw frame is displayed with a red text overlay: <code>"No model loaded — use /api/load_model"</code>.</li>
+      <li>In <strong>API endpoints</strong> (detect/image, detect/video): Returns JSON error: <code>{'success': False, 'message': 'No model loaded. Please load a model first.'}</code></li>
+      <li>In <strong>detector.py</strong>: The <code>detect()</code> method returns <code>None</code> if model is not loaded, and <code>format_results()</code> returns an empty list for <code>None</code> results.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">10</span> What design pattern does the project use for its modules? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p>The project uses a <strong>modular architecture</strong> with <strong>separation of concerns</strong>:</p>
+    <ul>
+      <li><strong>Detector</strong> (utils/detector.py) — Encapsulates YOLO inference (Single Responsibility)</li>
+      <li><strong>Visualizer</strong> (utils/visualization.py) — Handles all drawing operations</li>
+      <li><strong>Navigator</strong> (navigation/navigator.py) — Route planning & zone mapping</li>
+      <li><strong>AudioGuide</strong> (navigation/audio_guide.py) — TTS with fallback pattern (Strategy Pattern)</li>
+      <li><strong>Settings</strong> (config/settings.py) — Centralized configuration (Configuration Pattern)</li>
+      <li><strong>app.py</strong> — Controller/orchestrator that ties everything together</li>
+    </ul>
+    <p>The AudioGuide also uses a <strong>fallback/chain</strong> pattern: tries pyttsx3 → gTTS → console print.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">11</span> What are the web UI pages available and what does each do? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>Page</th><th>URL</th><th>Purpose</th></tr>
+      <tr><td>Dashboard</td><td><code>/</code></td><td>Load model, system overview, list saved models</td></tr>
+      <tr><td>Demo Mode</td><td><code>/demo</code></td><td>Instant demo, dataset download options</td></tr>
+      <tr><td>Train</td><td><code>/train</code></td><td>Upload dataset, configure & start model training</td></tr>
+      <tr><td>Detect</td><td><code>/detect</code></td><td>Image / Video / Live camera detection</td></tr>
+      <tr><td>Navigation</td><td><code>/navigation</code></td><td>Route planner, interactive station map, live guidance</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">12</span> How does the project achieve real-time performance? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <ul>
+      <li><strong>YOLOv8n (nano)</strong> — Smallest YOLO variant (~6MB), optimized for speed</li>
+      <li><strong>Threading</strong> — Training, audio, and synthetic dataset generation run in background threads</li>
+      <li><strong>MJPEG streaming</strong> — Video frames are JPEG-encoded and streamed efficiently via HTTP multipart</li>
+      <li><strong>Debounced audio</strong> — Audio cues have a 4-second debounce to prevent overwhelming the TTS engine</li>
+      <li><strong>JPEG quality 80</strong> — Frames are compressed at quality 80 for bandwidth efficiency</li>
+      <li><strong>Verbose=False</strong> — YOLO inference runs silently to reduce I/O overhead</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">13</span> What security measures are implemented? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <ul>
+      <li><strong>Secret Key:</strong> Flask app uses <code>SECRET_KEY</code> from environment variable or default</li>
+      <li><strong>File Upload Safety:</strong> <code>secure_filename()</code> from Werkzeug sanitizes uploaded filenames</li>
+      <li><strong>Allowed Extensions:</strong> Only specific image (<code>png, jpg, jpeg, bmp, webp</code>) and video (<code>mp4, avi, mov, mkv, webm</code>) types are accepted</li>
+      <li><strong>Max Content Length:</strong> Uploads limited to 500 MB (<code>MAX_CONTENT_LENGTH = 500 * 1024 * 1024</code>)</li>
+      <li><strong>Timestamped filenames:</strong> Uploads are prefixed with Unix timestamp to prevent overwrites</li>
+      <li><strong>Local processing:</strong> All data is processed locally — no data sent to external servers</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">14</span> Explain how the COCO-to-Navigation class mapping works in demo.py. <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p>Since the pretrained YOLOv8n model detects 80 COCO classes, the demo maps relevant COCO classes to navigation-specific classes:</p>
+    <pre>COCO_TO_NAV = {
+    'person':     'person',
+    'bicycle':    'person_with_luggage',
+    'wheelchair': 'wheelchair_user',
+    'handbag':    'person_with_luggage',
+    'backpack':   'person_with_luggage',
+    'suitcase':   'person_with_luggage',
+    'umbrella':   'blind_person',       # demo approximation
+}</pre>
+    <p>This allows the demo to work <strong>without custom training</strong>. The COCO "person" class works immediately; other mappings are approximations for demonstration purposes.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">15</span> What is the role of global state variables in app.py? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>detector    = Detector()      # YOLO model wrapper (shared across requests)
+visualizer  = Visualizer()    # Drawing utility
+navigator   = Navigator()     # BFS route planner
+audio_guide = AudioGuide()    # TTS engine
+
+camera_active   = False       # Flag to control live camera stream
+camera_lock     = threading.Lock()  # Thread safety for camera access
+current_camera  = None        # Current cv2.VideoCapture object
+training_status = {           # Training progress tracking
+    'running': False, 'progress': 0,
+    'log': [], 'done': False, 'error': None
+}</pre>
+    <p>These globals are shared across all HTTP requests and threads. The <code>camera_lock</code> ensures thread-safe access to camera state.</p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 2: YOLOv8 & OBJECT DETECTION -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<div class="section-header page-break"><div class="sec-num">2</div><h2>YOLOv8 & Object Detection</h2></div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">1</span> What is YOLO and what does it stand for? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p><strong>YOLO</strong> stands for <strong>"You Only Look Once"</strong>. It is a real-time object detection algorithm that treats detection as a single regression problem, predicting bounding boxes and class probabilities directly from full images in one forward pass.</p>
+    <p>Unlike two-stage detectors (R-CNN), YOLO processes the entire image at once, making it significantly faster — enabling real-time detection at 30+ FPS.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">2</span> What is YOLOv8 and why is it used in this project? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p><strong>YOLOv8</strong> is the latest version by Ultralytics (2023). It is used because:</p>
+    <ul>
+      <li><strong>State-of-the-art accuracy</strong> — Best mAP among single-stage detectors</li>
+      <li><strong>Easy API</strong> — Simple Python interface (<code>from ultralytics import YOLO</code>)</li>
+      <li><strong>Multiple sizes</strong> — n (nano), s (small), m (medium), l (large), x (extra-large)</li>
+      <li><strong>Anchor-free</strong> — Eliminates anchor box tuning</li>
+      <li><strong>Built-in training</strong> — <code>model.train()</code> handles everything</li>
+      <li><strong>COCO pretrained</strong> — Works out-of-the-box for person detection</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">3</span> Explain the Detector class in <code>utils/detector.py</code>. <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p>The <code>Detector</code> class wraps YOLOv8 inference:</p>
+    <pre>class Detector:
+    def __init__(self):
+        self.model = None
+        self.conf  = 0.40   # confidence threshold
+        self.iou   = 0.45   # IoU threshold for NMS
+
+    def load(self, model_path):
+        # Loads YOLO model, returns (success, message)
+        self.model = YOLO(model_path)
+
+    def detect(self, frame):
+        # Runs model.predict() on a BGR frame
+        results = self.model.predict(frame, conf=self.conf,
+                                     iou=self.iou, verbose=False)
+        return results[0]
+
+    def format_results(self, results):
+        # Converts YOLO Results → list of dicts:
+        # {class_id, class_name, confidence, bbox, center}</pre>
+    <p>Key methods: <code>load()</code>, <code>detect()</code>, <code>format_results()</code>, <code>is_loaded()</code>, <code>set_conf()</code>, <code>set_iou()</code>.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">4</span> What is confidence threshold and IoU threshold? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p><strong>Confidence Threshold (conf = 0.40):</strong> Minimum probability score a detection must have to be considered valid. Detections below this score are discarded. A higher threshold reduces false positives but may miss real objects.</p>
+    <p><strong>IoU Threshold (iou = 0.45):</strong> Used in <strong>Non-Maximum Suppression (NMS)</strong>. IoU = Intersection over Union. If two bounding boxes for the same class overlap with IoU &gt; 0.45, the lower-confidence one is suppressed. This prevents duplicate detections.</p>
+    <div class="highlight-box">
+      <strong>Formula:</strong> IoU = Area of Overlap / Area of Union
+    </div>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">5</span> What is Non-Maximum Suppression (NMS)? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p>NMS is a post-processing step that removes redundant overlapping bounding boxes:</p>
+    <ol>
+      <li>Sort all detections by confidence score (descending)</li>
+      <li>Select the highest-confidence box</li>
+      <li>Remove all other boxes that have IoU &gt; threshold with the selected box</li>
+      <li>Repeat with remaining boxes</li>
+    </ol>
+    <p>In this project, IoU threshold is set to <strong>0.45</strong> — if two boxes overlap more than 45%, the weaker one is removed.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">6</span> What is the YOLO annotation format used in this project? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p>YOLO format stores one <code>.txt</code> file per image. Each line represents one object:</p>
+    <pre>&lt;class_id&gt; &lt;center_x&gt; &lt;center_y&gt; &lt;width&gt; &lt;height&gt;</pre>
+    <p>All values are <strong>normalized</strong> (0 to 1) relative to image dimensions:</p>
+    <ul>
+      <li><code>center_x = (x + w/2) / image_width</code></li>
+      <li><code>center_y = (y + h/2) / image_height</code></li>
+      <li><code>width = box_width / image_width</code></li>
+      <li><code>height = box_height / image_height</code></li>
+    </ul>
+    <p>Example: <code>2 0.5123 0.4567 0.1250 0.3200</code> means class 2 (blind_person), centered at (51.2%, 45.7%), with width 12.5% and height 32% of the image.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">7</span> Explain the <code>dataset.yaml</code> configuration file. <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>path: data/dataset          # root directory
+train: images/train         # training images (relative to path)
+val:   images/val           # validation images
+nc: 6                       # number of classes
+names:
+  0: person
+  1: wheelchair_user
+  2: blind_person
+  3: person_with_crutches
+  4: elderly_person
+  5: person_with_luggage</pre>
+    <p>This YAML file tells YOLOv8 where to find training/validation images, how many classes exist, and their names. It is passed to <code>model.train(data='config/dataset.yaml')</code>.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">8</span> What is the difference between YOLOv8n, YOLOv8s, YOLOv8m, YOLOv8l, and YOLOv8x? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>Model</th><th>Parameters</th><th>Speed</th><th>Accuracy</th><th>Use Case</th></tr>
+      <tr><td>YOLOv8n (nano)</td><td>~3.2M</td><td>Fastest</td><td>Lowest</td><td>Edge/mobile, real-time</td></tr>
+      <tr><td>YOLOv8s (small)</td><td>~11.2M</td><td>Fast</td><td>Good</td><td>Best speed/accuracy balance</td></tr>
+      <tr><td>YOLOv8m (medium)</td><td>~25.9M</td><td>Moderate</td><td>Better</td><td>General purpose</td></tr>
+      <tr><td>YOLOv8l (large)</td><td>~43.7M</td><td>Slow</td><td>High</td><td>High accuracy needed</td></tr>
+      <tr><td>YOLOv8x (extra)</td><td>~68.2M</td><td>Slowest</td><td>Highest</td><td>Maximum accuracy</td></tr>
+    </table>
+    <p>This project uses <strong>YOLOv8n</strong> by default for demo (speed) and recommends <strong>YOLOv8s</strong> for training (best balance).</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">9</span> How does the <code>format_results()</code> method work? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>def format_results(self, results) -> list:
+    if results is None: return []
+    detections = []
+    for box in results.boxes:
+        cls_id = int(box.cls[0])               # class index
+        name   = results.names.get(cls_id, ...) # class name
+        conf   = float(box.conf[0])             # confidence
+        x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())  # bbox
+        cx, cy = (x1+x2)//2, (y1+y2)//2        # center point
+        detections.append({
+            'class_id': cls_id, 'class_name': name,
+            'confidence': round(conf, 3),
+            'bbox': [x1,y1,x2,y2], 'center': [cx,cy]
+        })
+    return detections</pre>
+    <p>It converts raw YOLO tensors into a clean Python list of dictionaries. The center point is used for zone mapping.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">10</span> What is mAP (mean Average Precision) and how is it evaluated? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p><strong>mAP</strong> is the primary metric for evaluating object detection models:</p>
+    <ul>
+      <li><strong>Precision</strong> = True Positives / (True Positives + False Positives)</li>
+      <li><strong>Recall</strong> = True Positives / (True Positives + False Negatives)</li>
+      <li><strong>AP (Average Precision)</strong> = Area under the Precision-Recall curve for one class</li>
+      <li><strong>mAP</strong> = Mean of AP across all classes</li>
+    </ul>
+    <p>Two key metrics used in <code>train.py</code>:</p>
+    <ul>
+      <li><code>mAP@0.5</code> — AP at IoU threshold 0.5</li>
+      <li><code>mAP@0.5:0.95</code> — Average of mAP at IoU thresholds 0.5, 0.55, ..., 0.95 (stricter)</li>
+    </ul>
+    <pre>metrics = model.val()
+print(f"mAP@0.5    : {metrics.box.map50:.4f}")
+print(f"mAP@0.5:0.95: {metrics.box.map:.4f}")</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">11</span> What is transfer learning and how is it used in this project? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p><strong>Transfer learning</strong> is a technique where a model pretrained on a large dataset (like COCO with 330K images, 80 classes) is fine-tuned on a smaller, domain-specific dataset.</p>
+    <p>In this project:</p>
+    <ol>
+      <li>Start with <code>yolov8n.pt</code> (pretrained on COCO) — already knows general features (edges, shapes, textures)</li>
+      <li>Fine-tune on custom 6-class navigation dataset — adapts to wheelchair users, blind persons, etc.</li>
+      <li>Benefits: Much less data needed (100-200 images vs. thousands), faster convergence, better accuracy</li>
+    </ol>
+    <pre>model = YOLO('yolov8n.pt')     # Load pretrained weights
+model.train(data='config/dataset.yaml', epochs=50)  # Fine-tune</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">12</span> What is the difference between <code>model.predict()</code> and <code>model.train()</code>? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>Method</th><th>Purpose</th><th>Usage</th></tr>
+      <tr><td><code>model.predict()</code></td><td>Run inference (detection) on images/frames</td><td><code>results = model.predict(frame, conf=0.4)</code></td></tr>
+      <tr><td><code>model.train()</code></td><td>Train/fine-tune the model on a dataset</td><td><code>model.train(data='dataset.yaml', epochs=50)</code></td></tr>
+      <tr><td><code>model.val()</code></td><td>Evaluate model on validation set</td><td><code>metrics = model.val()</code></td></tr>
+    </table>
+    <p><code>predict()</code> is used at inference time (fast, no gradients), while <code>train()</code> updates model weights using backpropagation.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">13</span> What are bounding boxes in object detection? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p>A <strong>bounding box</strong> is a rectangle that encloses a detected object. It is defined by:</p>
+    <ul>
+      <li><strong>xyxy format:</strong> (x1, y1, x2, y2) — top-left and bottom-right corners (used in results.boxes.xyxy)</li>
+      <li><strong>xywh format:</strong> (center_x, center_y, width, height) — used in YOLO label files</li>
+    </ul>
+    <p>The detector extracts <code>box.xyxy[0]</code> for pixel coordinates and computes center as:</p>
+    <pre>cx, cy = (x1 + x2) // 2, (y1 + y2) // 2</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">14</span> What is image size (imgsz) and why is 640 used? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p><code>imgsz=640</code> means input images are resized to 640×640 pixels before feeding into the YOLO model. This is because:</p>
+    <ul>
+      <li>Neural networks require fixed input dimensions</li>
+      <li>640×640 is the default for YOLOv8 — optimized stride/grid alignment</li>
+      <li>Larger sizes (1280) improve small object detection but are slower</li>
+      <li>Smaller sizes (320) are faster but less accurate</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">15</span> What is batch size in training? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p><strong>Batch size</strong> is the number of images processed simultaneously in one training iteration. Default is <code>batch=16</code>.</p>
+    <ul>
+      <li><strong>Larger batch</strong> — More stable gradients, faster training (needs more GPU memory)</li>
+      <li><strong>Smaller batch</strong> — Less memory, more noise in gradients, may generalize better</li>
+      <li><strong>batch=-1</strong> — Auto-batch: YOLO automatically determines the largest batch that fits in GPU memory</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">16</span> What is an epoch in training? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p>An <strong>epoch</strong> is one complete pass through the entire training dataset. If you have 200 training images and batch size 16, one epoch = 200/16 = 13 iterations (batches).</p>
+    <p>The project defaults to <strong>50 epochs</strong>. More epochs allow the model to learn better, but too many can cause <strong>overfitting</strong> (memorizing training data instead of generalizing).</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">17</span> What data augmentation techniques are used? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p>When <code>--augment</code> flag is used in <code>train.py</code>, extra augmentations are applied:</p>
+    <pre>train_kwargs.update(dict(
+    hsv_h=0.015,      # Hue shift ±1.5%
+    hsv_s=0.7,        # Saturation shift ±70%
+    hsv_v=0.4,        # Value/brightness shift ±40%
+    degrees=10,       # Random rotation ±10°
+    translate=0.1,    # Random translation ±10%
+    scale=0.5,        # Random scaling ±50%
+    flipud=0.1,       # Vertical flip 10% probability
+    fliplr=0.5,       # Horizontal flip 50% probability
+    mosaic=1.0,       # Mosaic augmentation 100%
+))</pre>
+    <p><strong>Mosaic augmentation</strong> combines 4 training images into one, exposing the model to more variety and context.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">18</span> What is the COCO dataset? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p><strong>COCO (Common Objects in Context)</strong> is a large-scale object detection dataset with:</p>
+    <ul>
+      <li>330K images, 200K labeled</li>
+      <li>80 object categories (person, car, dog, chair, etc.)</li>
+      <li>1.5 million object instances</li>
+    </ul>
+    <p>YOLOv8n.pt is pretrained on COCO, which means it can detect "person" out-of-the-box. The demo.py maps COCO's "person" class directly to the navigation system's "person" class.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">19</span> What is the difference between one-stage and two-stage detectors? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>Feature</th><th>One-Stage (YOLO, SSD)</th><th>Two-Stage (R-CNN, Faster R-CNN)</th></tr>
+      <tr><td>Approach</td><td>Single forward pass</td><td>Region proposal + classification</td></tr>
+      <tr><td>Speed</td><td>Very fast (real-time)</td><td>Slower</td></tr>
+      <tr><td>Accuracy</td><td>Slightly lower (but YOLOv8 is competitive)</td><td>Higher (traditionally)</td></tr>
+      <tr><td>Use Case</td><td>Real-time applications</td><td>High-accuracy applications</td></tr>
+    </table>
+    <p>This project uses YOLO (one-stage) because <strong>real-time speed is critical</strong> for navigation assistance.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">20</span> What is anchor-free detection in YOLOv8? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p>Earlier YOLO versions (v3, v5) used <strong>anchor boxes</strong> — predefined box shapes that the model adjusts. YOLOv8 is <strong>anchor-free</strong>, meaning:</p>
+    <ul>
+      <li>It directly predicts the center point and dimensions of objects</li>
+      <li>No need to predefine anchor sizes/ratios</li>
+      <li>Simplifies training and reduces hyperparameter tuning</li>
+      <li>Better generalization to objects of unusual sizes</li>
+    </ul>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 3: FLASK WEB APPLICATION -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<div class="section-header page-break"><div class="sec-num">3</div><h2>Flask Web Application & REST API</h2></div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">1</span> What is Flask and why is it used? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p><strong>Flask</strong> is a lightweight Python web framework (micro-framework). It is used because:</p>
+    <ul>
+      <li>Minimal boilerplate — easy to set up</li>
+      <li>Built-in development server with hot reload</li>
+      <li>Jinja2 templating for HTML rendering</li>
+      <li>Easy to create REST APIs with JSON responses</li>
+      <li>Good for prototyping and small-to-medium applications</li>
+      <li>Threading support for concurrent requests</li>
+    </ul>
+    <pre>app = Flask(__name__)
+app.run(debug=True, threaded=True, host='0.0.0.0', port=5000)</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">2</span> List all the API endpoints in the application. <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td>POST</td><td><code>/api/load_model</code></td><td>Load a YOLO model</td></tr>
+      <tr><td>POST</td><td><code>/api/train</code></td><td>Start model training</td></tr>
+      <tr><td>GET</td><td><code>/api/train/status</code></td><td>Poll training progress</td></tr>
+      <tr><td>POST</td><td><code>/api/train/stop</code></td><td>Stop training</td></tr>
+      <tr><td>POST</td><td><code>/api/detect/image</code></td><td>Detect objects in uploaded image</td></tr>
+      <tr><td>POST</td><td><code>/api/detect/video</code></td><td>Process uploaded video</td></tr>
+      <tr><td>GET</td><td><code>/video_feed</code></td><td>MJPEG live camera stream</td></tr>
+      <tr><td>POST</td><td><code>/api/camera/stop</code></td><td>Stop live camera</td></tr>
+      <tr><td>POST</td><td><code>/api/navigation/route</code></td><td>BFS route between zones</td></tr>
+      <tr><td>GET</td><td><code>/api/navigation/map</code></td><td>Station map JSON</td></tr>
+      <tr><td>POST</td><td><code>/api/speak</code></td><td>Trigger TTS</td></tr>
+      <tr><td>GET</td><td><code>/api/models</code></td><td>List saved models</td></tr>
+      <tr><td>POST</td><td><code>/api/models/upload</code></td><td>Upload .pt model</td></tr>
+      <tr><td>POST</td><td><code>/api/dataset/synthetic</code></td><td>Generate synthetic dataset</td></tr>
+      <tr><td>POST</td><td><code>/api/dataset/roboflow</code></td><td>Download Roboflow dataset</td></tr>
+      <tr><td>POST</td><td><code>/api/upload_dataset</code></td><td>Upload dataset .zip</td></tr>
+      <tr><td>POST</td><td><code>/api/upload_yaml</code></td><td>Upload dataset YAML</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">3</span> Explain the <code>/api/detect/image</code> endpoint flow. <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <ol>
+      <li>Receive uploaded image file via <code>request.files.get('image')</code></li>
+      <li>Validate file type and save with <code>save_upload()</code> (timestamped filename)</li>
+      <li>Check if model is loaded (<code>detector.is_loaded()</code>)</li>
+      <li>Read image with <code>cv2.imread(path)</code></li>
+      <li>Run detection: <code>results = detector.detect(frame)</code></li>
+      <li>Draw annotations: <code>annotated = visualizer.draw(frame, results, navigator)</code></li>
+      <li>Save annotated image: <code>cv2.imwrite(out_path, annotated)</code></li>
+      <li>Format detections and compute navigation directions</li>
+      <li>Return JSON with result image path, detections list, directions, and count</li>
+    </ol>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">4</span> How does MJPEG live streaming work in the <code>/video_feed</code> endpoint? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p>MJPEG (Motion JPEG) streaming sends continuous JPEG frames over HTTP using <strong>multipart/x-mixed-replace</strong>:</p>
+    <pre>def generate_frames(destination='platform_1'):
+    cap = cv2.VideoCapture(0)           # Open webcam
+    while camera_active:
+        ret, frame = cap.read()
+        # ... detection & annotation ...
+        ret2, buffer = cv2.imencode('.jpg', annotated,
+                                    [cv2.IMWRITE_JPEG_QUALITY, 80])
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' +
+               buffer.tobytes() + b'\r\n')
+
+@app.route('/video_feed')
+def video_feed():
+    return Response(generate_frames(destination),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')</pre>
+    <p>The browser receives this as a continuous stream of JPEG images, creating a video effect. Each frame is separated by the <code>--frame</code> boundary.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">5</span> What is <code>secure_filename()</code> and why is it important? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p><code>secure_filename()</code> from <code>werkzeug.utils</code> sanitizes user-provided filenames to prevent:</p>
+    <ul>
+      <li><strong>Path traversal attacks:</strong> e.g., <code>../../etc/passwd</code> → <code>etc_passwd</code></li>
+      <li><strong>Special characters:</strong> Removes shell-dangerous characters</li>
+      <li><strong>Unicode issues:</strong> Normalizes Unicode characters</li>
+    </ul>
+    <pre>from werkzeug.utils import secure_filename
+fname = secure_filename(file.filename)  # "../../hack.py" → "hack.py"</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">6</span> How does training work via the web API? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p>Training runs in a <strong>background thread</strong> so it doesn't block the web server:</p>
+    <pre>@app.route('/api/train', methods=['POST'])
+def start_training():
+    # 1. Check if already training
+    if training_status['running']:
+        return error
+
+    # 2. Parse parameters (epochs, batch, model, etc.)
+    # 3. Reset training_status dict
+    # 4. Start background thread:
+    t = threading.Thread(target=run_training, daemon=True)
+    t.start()
+
+    # 5. run_training() function:
+    #    - Loads YOLO model
+    #    - Calls model.train(...)
+    #    - Copies best.pt to models/
+    #    - Updates training_status dict</pre>
+    <p>The frontend polls <code>/api/train/status</code> to track progress, and <code>/api/train/stop</code> can halt it.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">7</span> What is the <code>allowed_file()</code> function? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>ALLOWED_IMAGES = {'png', 'jpg', 'jpeg', 'bmp', 'webp'}
+ALLOWED_VIDEOS = {'mp4', 'avi', 'mov', 'mkv', 'webm'}
+
+def allowed_file(filename, allowed):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in allowed</pre>
+    <p>It extracts the file extension using <code>rsplit('.', 1)</code> (split from right, max 1 split) and checks if it's in the allowed set. This prevents uploading malicious file types.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">8</span> What is Jinja2 templating? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p><strong>Jinja2</strong> is Flask's default template engine. It allows embedding Python logic in HTML:</p>
+    <pre>&lt;!-- templates/index.html --&gt;
+{% extends "base.html" %}    &lt;!-- Template inheritance --&gt;
+
+{% for model in models %}    &lt;!-- Loop --&gt;
+  &lt;option&gt;{{ model }}&lt;/option&gt;  &lt;!-- Variable --&gt;
+{% endfor %}
+
+{% if models %}              &lt;!-- Conditional --&gt;
+  &lt;p&gt;Models available&lt;/p&gt;
+{% endif %}</pre>
+    <p>Flask's <code>render_template()</code> combines templates with data:</p>
+    <pre>return render_template('index.html', models=models)</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">9</span> What is <code>jsonify()</code> in Flask? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p><code>jsonify()</code> converts Python dictionaries/lists to JSON HTTP responses with proper <code>Content-Type: application/json</code> header:</p>
+    <pre>return jsonify({
+    'success': True,
+    'detections': detections,
+    'count': len(detections)
+})</pre>
+    <p>It handles serialization, sets headers, and returns a proper Flask Response object.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">10</span> What is the purpose of <code>app.config['MAX_CONTENT_LENGTH']</code>? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500 MB</pre>
+    <p>This limits the maximum upload size to 500 MB. If a user tries to upload a file larger than this, Flask automatically returns a <strong>413 Request Entity Too Large</strong> error. This prevents the server from running out of memory or disk space from excessively large uploads.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">11</span> What is the purpose of <code>threading.Lock()</code> in the camera handling? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>camera_lock = threading.Lock()
+
+with camera_lock:
+    camera_active = True
+    current_camera = cap</pre>
+    <p>A <strong>Lock</strong> prevents race conditions when multiple threads access shared resources (camera state). Only one thread can hold the lock at a time. Without it, the camera could be started/stopped simultaneously from different requests, causing crashes.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">12</span> How does the dataset upload endpoint work? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>@app.route('/api/upload_dataset', methods=['POST'])
+def upload_dataset():
+    f = request.files.get('dataset')
+    if f and f.filename.endswith('.zip'):
+        zpath = os.path.join('data', 'dataset.zip')
+        f.save(zpath)                      # Save zip
+        import zipfile
+        with zipfile.ZipFile(zpath, 'r') as z:
+            z.extractall('data/dataset')   # Extract to dataset dir
+        os.remove(zpath)                   # Clean up zip
+        return jsonify({'success': True, ...})</pre>
+    <p>It accepts a <code>.zip</code> file, saves it, extracts contents into <code>data/dataset/</code>, and deletes the zip.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">13</span> What does <code>app.run(debug=True, threaded=True, host='0.0.0.0', port=5000)</code> mean? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <ul>
+      <li><code>debug=True</code> — Enables auto-reload on code changes + detailed error pages</li>
+      <li><code>threaded=True</code> — Handles each request in a separate thread (needed for video streaming)</li>
+      <li><code>host='0.0.0.0'</code> — Listens on all network interfaces (accessible from other devices)</li>
+      <li><code>port=5000</code> — Runs on port 5000</li>
+    </ul>
+    <div class="highlight-box">
+      <strong>Note:</strong> <code>debug=True</code> should be disabled in production for security reasons.
+    </div>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">14</span> What is a REST API? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p><strong>REST (Representational State Transfer)</strong> is an architectural style for web APIs:</p>
+    <ul>
+      <li><strong>Resources</strong> are identified by URLs (<code>/api/models</code>, <code>/api/detect/image</code>)</li>
+      <li><strong>HTTP methods</strong> define actions: GET (read), POST (create/action), PUT (update), DELETE (remove)</li>
+      <li><strong>Stateless</strong> — Each request contains all needed information</li>
+      <li><strong>JSON</strong> is the standard data format</li>
+    </ul>
+    <p>This project follows REST conventions: GET for fetching data, POST for actions/uploads.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">15</span> How does the <code>save_upload()</code> helper work? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>def save_upload(file, allowed_set):
+    if file and allowed_file(file.filename, allowed_set):
+        fname = secure_filename(file.filename)   # sanitize
+        ts    = str(int(time.time()))             # unix timestamp
+        fname = f"{ts}_{fname}"                   # prevent collisions
+        path  = os.path.join(UPLOAD_FOLDER, fname)
+        file.save(path)
+        return path
+    return None</pre>
+    <p>It validates the file, sanitizes the name, adds a timestamp prefix for uniqueness, saves to <code>static/uploads/</code>, and returns the file path.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">16</span> What is the difference between <code>request.json</code> and <code>request.files</code>? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>Property</th><th>Usage</th><th>Content-Type</th></tr>
+      <tr><td><code>request.json</code></td><td>Parse JSON body data</td><td><code>application/json</code></td></tr>
+      <tr><td><code>request.files</code></td><td>Access uploaded files</td><td><code>multipart/form-data</code></td></tr>
+      <tr><td><code>request.form</code></td><td>Access form fields</td><td><code>application/x-www-form-urlencoded</code></td></tr>
+      <tr><td><code>request.args</code></td><td>URL query parameters</td><td>N/A (in URL)</td></tr>
+    </table>
+    <p>Example: <code>/api/train</code> uses <code>request.json</code> for parameters; <code>/api/detect/image</code> uses <code>request.files</code> for the image.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">17</span> What is the purpose of the daemon thread in training? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>t = threading.Thread(target=run_training, daemon=True)
+t.start()</pre>
+    <p><code>daemon=True</code> means the thread will be automatically killed when the main program exits. Without it, the training thread would keep the application alive even after you try to stop the server. Daemon threads are used for background tasks that should not prevent program shutdown.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">18</span> How does the video detection endpoint process each frame? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>cap = cv2.VideoCapture(path)
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # codec
+out = cv2.VideoWriter(out_path, fourcc, fps, (w, h))
+
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret: break
+    results   = detector.detect(frame)        # detect per frame
+    annotated = visualizer.draw(frame, results, navigator)
+    out.write(annotated)                      # write annotated frame
+
+cap.release()
+out.release()</pre>
+    <p>It opens the video, processes each frame through YOLO detection and visualization, writes the annotated frame to a new MP4 file, and returns the result path.</p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 4: BFS NAVIGATION -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<div class="section-header page-break"><div class="sec-num">4</div><h2>BFS Navigation & Graph Routing</h2></div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">1</span> What is BFS (Breadth-First Search)? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p><strong>BFS</strong> is a graph traversal algorithm that explores nodes level by level, starting from the source. It guarantees finding the <strong>shortest path</strong> in an unweighted graph.</p>
+    <ul>
+      <li>Uses a <strong>queue</strong> (FIFO) data structure</li>
+      <li>Time complexity: O(V + E) where V = vertices, E = edges</li>
+      <li>Space complexity: O(V)</li>
+      <li>Explores all neighbors at current depth before moving deeper</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">2</span> Explain the BFS implementation in <code>navigator.py</code>. <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>def get_route(self, src, dst):
+    if src == dst:
+        return [src], ["You have arrived at your destination."]
+
+    from collections import deque
+    visited = {src: None}          # Track parent of each node
+    queue   = deque([src])         # BFS queue
+
+    while queue:
+        node = queue.popleft()     # Dequeue front
+        if node == dst:
+            break                  # Found destination
+        for (nxt, _, _) in STATION_GRAPH.get(node, []):
+            if nxt not in visited:
+                visited[nxt] = node  # Record parent
+                queue.append(nxt)    # Enqueue neighbor
+
+    # Reconstruct path by backtracking parents
+    path = []
+    cur = dst
+    while cur is not None:
+        path.append(cur)
+        cur = visited.get(cur)
+    path.reverse()
+
+    # Build step-by-step instructions
+    steps = []
+    for i in range(len(path) - 1):
+        for (nxt, instr, _) in STATION_GRAPH.get(path[i], []):
+            if nxt == path[i+1]:
+                steps.append(instr)
+                break
+    return path, steps</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">3</span> What data structure is used to represent the station graph? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p>The station is represented as an <strong>adjacency list</strong> using a Python dictionary:</p>
+    <pre>STATION_GRAPH = {
+    'entrance': [
+        ('main_hall', 'Walk straight into the main hall', 'down'),
+        ('ticket_counter', 'Turn right to reach ticket counter', 'right'),
+        ('restroom', 'Turn left for the restroom', 'left'),
+    ],
+    'main_hall': [
+        ('entrance', 'Walk towards the main entrance', 'up'),
+        ('platform_1', 'Turn left to Platform 1', 'left'),
+        ...
+    ],
+    ...
+}</pre>
+    <p>Each key is a zone, and the value is a list of tuples: <code>(neighbor_zone, instruction_text, arrow_direction)</code>. This is a <strong>directed graph</strong> where each edge has navigation metadata.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">4</span> How does zone detection work from pixel coordinates? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>def get_zone(self, fx: float, fy: float) -> str:
+    """Return zone name for a normalised (fx, fy) position."""
+    for zone, (x1, y1, x2, y2) in Settings.ZONES.items():
+        if x1 <= fx <= x2 and y1 <= fy <= y2:
+            return zone
+    return 'main_hall'   # default fallback</pre>
+    <p>Steps:</p>
+    <ol>
+      <li>Detection center (cx, cy) is computed from bounding box</li>
+      <li>Normalized: <code>fx = cx / frame_width</code>, <code>fy = cy / frame_height</code> (values 0 to 1)</li>
+      <li>Compare against each zone's fractional bounds</li>
+      <li>First matching zone is returned; default is 'main_hall'</li>
+    </ol>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">5</span> How is path reconstruction done after BFS? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p>BFS stores the <strong>parent</strong> of each visited node in the <code>visited</code> dictionary. To reconstruct the path:</p>
+    <ol>
+      <li>Start at destination node</li>
+      <li>Follow parent pointers backward: <code>cur = visited.get(cur)</code></li>
+      <li>Collect each node into a list</li>
+      <li>Reverse the list to get source-to-destination order</li>
+    </ol>
+    <p>Example: entrance → main_hall → platform_1</p>
+    <pre>visited = {'entrance': None, 'main_hall': 'entrance', 'platform_1': 'main_hall'}
+# Backtrack from platform_1: platform_1 → main_hall → entrance
+# Reverse: [entrance, main_hall, platform_1]</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">6</span> What happens if no route is found? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>if path[0] != src:
+    return [src, dst], [f"Direct route not found. Head towards {dst_name}."]</pre>
+    <p>If backtracking doesn't reach the source (disconnected graph), the system returns a direct fallback instruction: "Head towards [destination]". This ensures the user always gets <em>some</em> guidance even if the graph is incomplete.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">7</span> Explain the <code>get_directions_from_detections()</code> method. <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>def get_directions_from_detections(self, detections, frame_shape,
+                                    destination='platform_1'):
+    h, w = frame_shape[:2]
+    directions = []
+    for det in detections:
+        cx, cy = det['center']
+        fx, fy = cx / w, cy / h          # Normalize
+        zone = self.get_zone(fx, fy)      # Find zone
+        _, steps = self.get_route(zone, destination)  # BFS
+        directions.append({
+            'class': det['class_name'],
+            'zone': ZONE_DISPLAY_NAMES.get(zone, zone),
+            'instruction': steps[0],       # First step only
+            'confidence': det['confidence'],
+        })
+    return directions</pre>
+    <p>For each detected person, it computes their zone, runs BFS to get the route, and returns the first step instruction for audio/visual guidance.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">8</span> What is the <code>get_arrow_direction()</code> method used for? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p>It determines the arrow direction to display on the annotated frame:</p>
+    <ol>
+      <li>If current zone = destination → return <code>'arrived'</code></li>
+      <li>Check direct neighbors for the destination</li>
+      <li>If not a direct neighbor, run BFS and use the first step's arrow direction</li>
+      <li>Fallback: <code>'up'</code></li>
+    </ol>
+    <p>The arrow is drawn visually on the frame near the detected person, pointing them toward their next zone.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">9</span> Why is <code>deque</code> used instead of a regular list for BFS? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p><code>collections.deque</code> provides O(1) <code>popleft()</code> operations, while a regular list's <code>pop(0)</code> is O(n) because all elements must be shifted. For BFS:</p>
+    <table>
+      <tr><th>Operation</th><th>list</th><th>deque</th></tr>
+      <tr><td>append (enqueue)</td><td>O(1)</td><td>O(1)</td></tr>
+      <tr><td>pop(0) / popleft (dequeue)</td><td>O(n)</td><td>O(1)</td></tr>
+    </table>
+    <p>This makes deque essential for efficient BFS in larger graphs.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">10</span> How does the station map JSON endpoint work? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>def get_station_map(self):
+    nodes = []
+    for zone, name in ZONE_DISPLAY_NAMES.items():
+        x1, y1, x2, y2 = Settings.ZONES[zone]
+        nodes.append({
+            'id': zone, 'name': name,
+            'x': (x1+x2)/2, 'y': (y1+y2)/2,  # center coords
+        })
+    edges = []
+    for src, connections in STATION_GRAPH.items():
+        for (dst, instr, _) in connections:
+            edges.append({'from': src, 'to': dst, 'instruction': instr})
+    return {'nodes': nodes, 'edges': edges, 'zone_names': ZONE_DISPLAY_NAMES}</pre>
+    <p>Returns nodes (zones with center positions) and edges (connections with instructions) as JSON for the frontend to render an interactive station map.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">11</span> Why is BFS preferred over DFS for route finding? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <ul>
+      <li><strong>BFS guarantees shortest path</strong> in unweighted graphs — critical for giving passengers the most efficient route</li>
+      <li>DFS might find a valid path but not the shortest one</li>
+      <li>Station graph is small (9 nodes), so BFS performance overhead is negligible</li>
+      <li>BFS explores level by level, which naturally gives the minimum number of zone transitions</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">12</span> What is the time complexity of BFS in this station graph? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p>BFS time complexity is <strong>O(V + E)</strong> where V = number of zones (vertices) and E = number of connections (edges).</p>
+    <ul>
+      <li>V = 9 zones</li>
+      <li>E ≈ 25 connections (edges in STATION_GRAPH)</li>
+      <li>So O(9 + 25) = O(34) — essentially constant time</li>
+    </ul>
+    <p>Even with path reconstruction, the total work is negligible for 9 nodes, making it suitable for real-time per-frame computation.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">13</span> What are the 8 possible arrow directions? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>ARROW_MAP = {
+    'left':       (-60,   0),
+    'right':      ( 60,   0),
+    'up':         (  0, -60),
+    'down':       (  0,  60),
+    'up-left':    (-45, -45),
+    'up-right':   ( 45, -45),
+    'down-left':  (-45,  45),
+    'down-right': ( 45,  45),
+    'arrived':    (  0,   0),   # Special: draw circle instead
+}</pre>
+    <p>Each direction maps to (dx, dy) pixel offsets from the detection center. The arrow is drawn using <code>cv2.arrowedLine()</code>. The 'arrived' state draws a green circle with "HERE" text.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">14</span> What is the role of <code>ZONE_DISPLAY_NAMES</code>? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>ZONE_DISPLAY_NAMES = {
+    'entrance':       'Entrance',
+    'main_hall':      'Main Hall',
+    'platform_1':     'Platform 1',
+    'restroom':       'Restroom / Washroom',
+    'elevator':       'Elevator / Lift',
+    ...
+}</pre>
+    <p>It maps internal zone keys (snake_case) to <strong>human-readable display names</strong>. Used in API responses, audio announcements, and UI display. Internal keys are used for graph operations while display names are user-facing.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">15</span> Can the station graph handle bidirectional connections? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p>Yes. The graph is <strong>directed</strong> — each direction has its own instruction. For example:</p>
+    <ul>
+      <li><code>entrance → main_hall</code>: "Walk straight into the main hall" (arrow: down)</li>
+      <li><code>main_hall → entrance</code>: "Walk towards the main entrance" (arrow: up)</li>
+    </ul>
+    <p>Bidirectional connections are explicitly defined with different instructions and arrows for each direction, providing context-appropriate navigation guidance.</p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 5: OpenCV & Visualization -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<div class="section-header page-break"><div class="sec-num">5</div><h2>OpenCV & Visualization</h2></div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">1</span> What is OpenCV and what is it used for in this project? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p><strong>OpenCV (Open Source Computer Vision Library)</strong> is an open-source library for image and video processing. In this project it is used for:</p>
+    <ul>
+      <li>Reading images (<code>cv2.imread()</code>)</li>
+      <li>Capturing video from webcam (<code>cv2.VideoCapture()</code>)</li>
+      <li>Drawing bounding boxes, arrows, text overlays (<code>cv2.rectangle()</code>, <code>cv2.arrowedLine()</code>)</li>
+      <li>Encoding frames to JPEG for streaming (<code>cv2.imencode()</code>)</li>
+      <li>Writing output videos (<code>cv2.VideoWriter()</code>)</li>
+      <li>Displaying windows (<code>cv2.imshow()</code>)</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">2</span> Explain the Visualizer class and its methods. <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>Method</th><th>Purpose</th></tr>
+      <tr><td><code>draw()</code></td><td>Main entry — draws zones, HUD, boxes, arrows</td></tr>
+      <tr><td><code>_draw_box()</code></td><td>Draws bounding box with corner accents and label</td></tr>
+      <tr><td><code>_draw_zone_overlay()</code></td><td>Semi-transparent colored zone rectangles</td></tr>
+      <tr><td><code>_draw_hud()</code></td><td>Top bar with system title</td></tr>
+      <tr><td><code>_draw_detection_count()</code></td><td>Bottom bar showing person count</td></tr>
+      <tr><td><code>_draw_arrow()</code></td><td>Navigation arrow from detection center</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">3</span> How does the semi-transparent zone overlay work? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>def _draw_zone_overlay(self, img, w, h):
+    overlay = img.copy()                  # Copy of original
+    for zone, (x1f, y1f, x2f, y2f) in Settings.ZONES.items():
+        zx1, zy1 = int(x1f * w), int(y1f * h)  # Convert fractions to pixels
+        zx2, zy2 = int(x2f * w), int(y2f * h)
+        cv2.rectangle(overlay, (zx1,zy1), (zx2,zy2), color, -1)  # Filled rect
+        cv2.rectangle(img, (zx1,zy1), (zx2,zy2), color, 1)       # Border
+    cv2.addWeighted(overlay, 0.12, img, 0.88, 0, img)  # Blend at 12% opacity</pre>
+    <p><code>cv2.addWeighted()</code> blends two images: <code>dst = α × overlay + β × img + γ</code>. With α=0.12, the colored rectangles appear as subtle transparent overlays.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">4</span> What is BGR color format and why does OpenCV use it? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p>OpenCV uses <strong>BGR (Blue, Green, Red)</strong> instead of the more common RGB order. This is a historical decision from when the library was created — early camera hardware used BGR format.</p>
+    <p>Example from settings: <code>'person': (219, 86, 26)</code> means B=219, G=86, R=26 (appears orange-brown).</p>
+    <p>When displaying or saving, OpenCV handles BGR natively. When converting to PIL or web formats, use <code>cv2.cvtColor(img, cv2.COLOR_BGR2RGB)</code>.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">5</span> How do corner accents enhance bounding box visualization? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>def _draw_box(self, img, x1, y1, x2, y2, label, conf, color):
+    cv2.rectangle(img, (x1,y1), (x2,y2), color, 2)  # Main box
+    cs = 14  # Corner size
+    # Top-left corner
+    cv2.line(img, (x1,y1), (x1+cs, y1), color, 3)  # horizontal
+    cv2.line(img, (x1,y1), (x1, y1+cs), color, 3)  # vertical
+    # ... same for other 3 corners ...</pre>
+    <p>Corner accents are <strong>thicker short lines (3px, 14px long)</strong> at each corner of the bounding box. This creates a modern, professional-looking detection visualization commonly seen in security/surveillance interfaces.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">6</span> What is <code>cv2.VideoWriter_fourcc()</code>? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+writer = cv2.VideoWriter(out_path, fourcc, fps, (w, h))</pre>
+    <p><strong>FourCC (Four Character Code)</strong> is a 4-byte code that identifies the video codec:</p>
+    <ul>
+      <li><code>'mp4v'</code> — MPEG-4 codec (used in this project)</li>
+      <li><code>'XVID'</code> — Xvid MPEG-4</li>
+      <li><code>'MJPG'</code> — Motion JPEG</li>
+      <li><code>'H264'</code> — H.264 codec</li>
+    </ul>
+    <p>The <code>*'mp4v'</code> unpacks the string into individual characters: <code>'m','p','4','v'</code>.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">7</span> How is FPS calculated in the live detection mode? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>t0 = time.time()
+results = detector.detect(frame)
+annotated = visualizer.draw(frame, results, ...)
+elapsed = time.time() - t0
+fps_disp = 1 / max(elapsed, 0.001)   # Prevent division by zero</pre>
+    <p>FPS = 1 / processing_time_per_frame. The <code>max(elapsed, 0.001)</code> ensures no division by zero. In the demo, exponential smoothing is used: <code>fps = 0.9*fps + 0.1*(1/elapsed)</code> for stable display.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">8</span> What does <code>cv2.waitKey(1) & 0xFF</code> do? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p><code>cv2.waitKey(1)</code> waits 1 millisecond for a key press. The <code>& 0xFF</code> masks the result to get the last 8 bits (ASCII value), needed for compatibility on some systems where <code>waitKey</code> returns a larger integer.</p>
+    <pre>key = cv2.waitKey(1) & 0xFF
+if key == ord('q'):     # 'q' to quit
+    break
+if key == ord('s'):     # 's' to save snapshot
+    cv2.imwrite(snap, annotated)</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">9</span> How does <code>cv2.imencode()</code> work for MJPEG streaming? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>ret2, buffer = cv2.imencode('.jpg', annotated,
+                             [cv2.IMWRITE_JPEG_QUALITY, 80])</pre>
+    <p>It compresses an OpenCV image array into JPEG format in memory (no file I/O). The second argument specifies JPEG quality (0-100, default 95). Quality 80 is used for streaming to reduce bandwidth while maintaining visual quality. Returns a boolean success flag and the compressed byte buffer.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">10</span> What is the difference between <code>cv2.imread()</code> and <code>cv2.VideoCapture()</code>? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>Function</th><th>Purpose</th><th>Returns</th></tr>
+      <tr><td><code>cv2.imread(path)</code></td><td>Read a single image from disk</td><td>NumPy array (BGR)</td></tr>
+      <tr><td><code>cv2.VideoCapture(source)</code></td><td>Open video file or camera</td><td>VideoCapture object</td></tr>
+    </table>
+    <p>VideoCapture can open a camera (<code>VideoCapture(0)</code> for webcam index 0), a video file (<code>VideoCapture('video.mp4')</code>), or an RTSP stream. It reads frames one by one with <code>cap.read()</code>.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">11</span> What is <code>cv2.putText()</code> and what parameters does it take? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>cv2.putText(img,                     # image to draw on
+            'Navigation Assistance', # text string
+            (8, 19),                 # position (x, y) of text baseline
+            cv2.FONT_HERSHEY_SIMPLEX, # font face
+            0.50,                    # font scale
+            (180, 230, 255),         # color (BGR)
+            1,                       # thickness
+            cv2.LINE_AA)             # anti-aliased line type</pre>
+    <p><code>cv2.LINE_AA</code> enables anti-aliasing for smoother text rendering.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">12</span> How is the camera resolution set in the project? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>cap = cv2.VideoCapture(0)                       # Open default webcam
+cap.set(cv2.CAP_PROP_FRAME_WIDTH,  1280)         # Set width to 1280
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)          # Set height to 720</pre>
+    <p><code>cap.set()</code> configures camera properties. <code>CAP_PROP_FRAME_WIDTH</code> and <code>CAP_PROP_FRAME_HEIGHT</code> set the capture resolution to 720p (1280×720). The actual resolution depends on camera hardware support.</p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 6: AUDIO GUIDE & TTS -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<div class="section-header page-break"><div class="sec-num">6</div><h2>Audio Guide & Text-to-Speech</h2></div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">1</span> What TTS engines does the AudioGuide use? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p>The AudioGuide uses a <strong>fallback chain</strong> of 3 TTS methods:</p>
+    <ol>
+      <li><strong>pyttsx3</strong> (primary) — Offline TTS engine. Works without internet. Uses OS-native speech (SAPI5 on Windows, espeak on Linux, NSSpeech on macOS).</li>
+      <li><strong>gTTS</strong> (fallback) — Google Text-to-Speech. Requires internet. Generates MP3 files played via <code>playsound</code>.</li>
+      <li><strong>Console print</strong> (last resort) — If both TTS engines fail, prints the message to console.</li>
+    </ol>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">2</span> Explain the <code>speak()</code> method in AudioGuide. <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>def speak(self, text: str):
+    if not text: return
+    with self._lock:                    # Thread-safe
+        if self._engine:                # Try pyttsx3
+            try:
+                self._engine.say(text)
+                self._engine.runAndWait()
+                return
+            except: pass
+        try:                            # Fallback: gTTS
+            from gtts import gTTS
+            tts = gTTS(text=text, lang='en', slow=False)
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as f:
+                tmp = f.name
+            tts.save(tmp)
+            playsound.playsound(tmp)
+            os.unlink(tmp)              # Delete temp file
+        except:
+            print(f"[AudioGuide] {text}")  # Last resort</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">3</span> What is debouncing and how is it used in <code>speak_async()</code>? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>def speak_async(self, text: str, debounce: float = 4.0):
+    now = time.time()
+    if text == self._last_msg and (now - self._last_time) < debounce:
+        return                        # Skip if same message within 4 seconds
+    self._last_msg  = text
+    self._last_time = now
+    t = threading.Thread(target=self.speak, args=(text,), daemon=True)
+    t.start()</pre>
+    <p><strong>Debouncing</strong> prevents the same audio message from being repeated too frequently. If the same instruction is triggered within 4 seconds, it is silently ignored. This prevents overlapping speech when detecting the same person across multiple frames.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">4</span> Why is <code>threading.Lock()</code> used in the AudioGuide? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p>The <code>self._lock</code> ensures that only one thread can use the TTS engine at a time. Without it:</p>
+    <ul>
+      <li>Multiple detection frames might trigger concurrent speech calls</li>
+      <li>pyttsx3 is not thread-safe — concurrent access crashes it</li>
+      <li>Two threads writing to the same audio output creates garbled sound</li>
+    </ul>
+    <p><code>with self._lock:</code> is a context manager that automatically acquires and releases the lock.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">5</span> What are the predefined audio announcements? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>def announce_destination(self, destination_name):
+    self.speak_async(f"Setting destination to {destination_name}")
+
+def announce_direction(self, instruction):
+    self.speak_async(instruction)
+
+def announce_arrived(self):
+    self.speak_async("You have arrived at your destination.")
+
+def welcome(self):
+    self.speak_async(
+        "Welcome to the Navigation Assistance System. "
+        "Please select your destination to begin."
+    )</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">6</span> How does pyttsx3 differ from gTTS? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>Feature</th><th>pyttsx3</th><th>gTTS</th></tr>
+      <tr><td>Internet Required</td><td>No (offline)</td><td>Yes (online)</td></tr>
+      <tr><td>Quality</td><td>Moderate (robotic)</td><td>High (natural)</td></tr>
+      <tr><td>Speed Control</td><td>Yes (rate property)</td><td>Yes (slow parameter)</td></tr>
+      <tr><td>Output</td><td>Direct audio playback</td><td>Saves MP3 file</td></tr>
+      <tr><td>Platforms</td><td>Windows, Linux, macOS</td><td>Any (uses Google API)</td></tr>
+      <tr><td>Latency</td><td>Low (immediate)</td><td>Higher (network + file I/O)</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">7</span> How is TTS speech rate configured? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>self._engine = pyttsx3.init()
+self._engine.setProperty('rate', 140)    # Words per minute (default ~200)
+self._engine.setProperty('volume', 1.0)  # Volume 0.0 to 1.0</pre>
+    <p>Rate 140 WPM is slower than default (200) for clearer comprehension by passengers who may be elderly or have hearing difficulties.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">8</span> How does the audio cue timing work during live camera streaming? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre># In app.py generate_frames():
+if int(time.time()) % 3 == 0 and detections:
+    dirs = navigator.get_directions_from_detections(...)
+    if dirs:
+        audio_guide.speak_async(dirs[0]['instruction'])</pre>
+    <p>Audio is triggered every 3 seconds (when Unix timestamp is divisible by 3). Combined with the 4-second debounce in <code>speak_async()</code>, this creates natural-feeling periodic announcements without overwhelming the user.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">9</span> What happens if the pyttsx3 engine fails to initialize? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>def _init_engine(self):
+    try:
+        import pyttsx3
+        self._engine = pyttsx3.init()
+        self._engine.setProperty('rate', 140)
+    except Exception:
+        self._engine = None     # Graceful degradation</pre>
+    <p>The engine is set to <code>None</code>, and subsequent <code>speak()</code> calls automatically fall back to gTTS or console output. This ensures the system works even if pyttsx3 is not installed or fails on the platform.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">10</span> Why is <code>tempfile.NamedTemporaryFile</code> used in gTTS fallback? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as f:
+    tmp = f.name
+tts.save(tmp)
+playsound.playsound(tmp)
+os.unlink(tmp)          # Delete after playing</pre>
+    <p>gTTS generates MP3 files (it can't play audio directly). <code>NamedTemporaryFile</code> creates a unique temporary file. <code>delete=False</code> keeps the file open for playsound. After playback, <code>os.unlink()</code> deletes the file to avoid accumulating temp files.</p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 7: DATASET PREPARATION -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<div class="section-header page-break"><div class="sec-num">7</div><h2>Dataset Preparation & Synthetic Data</h2></div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">1</span> What is the YOLO dataset folder structure? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <pre>data/dataset/
+├── images/
+│   ├── train/    # Training images (.jpg, .png)
+│   └── val/      # Validation images
+└── labels/
+    ├── train/    # YOLO .txt labels (one per image)
+    └── val/      # Validation labels</pre>
+    <p>Each label file has the <strong>same name</strong> as its image (different extension). Example: <code>photo001.jpg</code> → <code>photo001.txt</code>.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">2</span> How does the synthetic dataset generator work? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p><code>gen_synthetic.py</code> creates training data without real photos using <strong>PIL (Pillow)</strong>:</p>
+    <ol>
+      <li>Creates a 640×640 image with a station background (floor, ceiling, pillars, signs)</li>
+      <li>Randomly places 1-5 person silhouettes per image</li>
+      <li>Each person has class-specific features (wheelchair wheels, white cane, crutches, luggage)</li>
+      <li>Adds shadows, noise, and optional blur for realism</li>
+      <li>Generates YOLO-format labels with normalized coordinates</li>
+      <li>Saves images as JPEG (quality 88) and labels as .txt</li>
+    </ol>
+    <pre>python download_dataset.py --dataset synthetic --train 200 --val 50</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">3</span> How are YOLO label coordinates calculated in synthetic generation? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre># Pixel coordinates of drawn person
+px, py = random position
+pw, ph = random width, height
+
+# Convert to YOLO normalized format
+cx = (px + pw / 2) / W     # center_x (0 to 1)
+cy = (py + ph / 2) / H     # center_y (0 to 1)
+nw = pw / W                # normalized width
+nh = ph / H                # normalized height
+
+# Write label line
+labels.append(f"{cls_id} {cx:.4f} {cy:.4f} {nw:.4f} {nh:.4f}")</pre>
+    <p>All values are divided by image dimensions (W=640, H=640) to get fractions between 0 and 1.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">4</span> What is the <code>verify_dataset()</code> function? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p>It checks dataset integrity by verifying:</p>
+    <ol>
+      <li><strong>Missing labels:</strong> Every image must have a corresponding .txt label file</li>
+      <li><strong>Orphan labels:</strong> Every label must have a corresponding image</li>
+      <li><strong>Class distribution:</strong> Counts instances of each class across all labels</li>
+    </ol>
+    <pre>python prepare_dataset.py --verify</pre>
+    <p>Outputs a summary with total images, issues found, and a bar chart of class distribution.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">5</span> How does automatic train/val splitting work? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>def split_dataset(source, split=0.8):
+    images = sorted(list(src.glob('*.jpg')) + ...)  # Find all images
+    random.shuffle(images)                          # Random shuffle
+    n_train = int(len(images) * split)              # 80% train
+    splits = {
+        'train': images[:n_train],
+        'val':   images[n_train:]                   # 20% val
+    }
+    # Copy images and matching labels to respective folders</pre>
+    <p>Default 80/20 split. Images are randomly shuffled to ensure representative distribution.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">6</span> What dataset sources are supported? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>Source</th><th>Command</th><th>Requirements</th></tr>
+      <tr><td>Synthetic (generated)</td><td><code>--dataset synthetic</code></td><td>None (PIL/Pillow)</td></tr>
+      <tr><td>Roboflow API</td><td><code>--dataset roboflow --api-key KEY</code></td><td>Roboflow API key</td></tr>
+      <tr><td>Open Images (fiftyone)</td><td><code>--dataset openimages</code></td><td>fiftyone library</td></tr>
+      <tr><td>Manual upload</td><td>Web UI → Train page</td><td>.zip file</td></tr>
+      <tr><td>Custom images</td><td><code>prepare_dataset.py --source path</code></td><td>Annotated images</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">7</span> How does the Roboflow download work? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>from roboflow import Roboflow
+rf = Roboflow(api_key=api_key)
+project = rf.workspace(workspace).project(project)
+dataset = project.version(version).download("yolov8", location=str(DATASET_DIR))</pre>
+    <p>The Roboflow SDK connects to their API, downloads the specified project version in YOLOv8 format, and saves it directly into the dataset directory. This provides real, annotated training data.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">8</span> What is the <code>extract_and_organise()</code> function? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p>It handles uploaded zip files by:</p>
+    <ol>
+      <li>Extracting the zip to a temporary directory</li>
+      <li>Auto-detecting YOLO structure (finding images, labels, yaml)</li>
+      <li>Detecting train/val split folders, or auto-splitting 80/20 if flat</li>
+      <li>Copying files to the standard dataset directory structure</li>
+      <li>Saving any found YAML config to <code>config/</code></li>
+      <li>Cleaning up temporary files</li>
+    </ol>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">9</span> What class-specific visual features are drawn for each passenger type in synthetic data? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>Class</th><th>Visual Feature</th></tr>
+      <tr><td>person (0)</td><td>Basic head + body + legs silhouette</td></tr>
+      <tr><td>wheelchair_user (1)</td><td>Wheel ellipses below body</td></tr>
+      <tr><td>blind_person (2)</td><td>White cane line extending from hand</td></tr>
+      <tr><td>person_with_crutches (3)</td><td>Two diagonal crutch lines</td></tr>
+      <tr><td>elderly_person (4)</td><td>Walking stick / cane</td></tr>
+      <tr><td>person_with_luggage (5)</td><td>Rectangular luggage box beside body</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">10</span> Why is the minimum recommended dataset size 100-200 images per class? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p>Deep learning models need sufficient diverse examples to learn generalizable features:</p>
+    <ul>
+      <li><strong>Too few images (&lt;50)</strong> — Model overfits; memorizes training data instead of learning patterns</li>
+      <li><strong>100-200 images</strong> — Minimum for reasonable performance with transfer learning (pretrained YOLO)</li>
+      <li><strong>500+ images</strong> — Better generalization and robustness</li>
+      <li><strong>1000+ images</strong> — Ideal for production-quality models</li>
+    </ul>
+    <p>Data augmentation (flipping, rotation, scaling) helps artificially increase effective dataset size.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">11</span> What is <code>ImageFilter.GaussianBlur</code> used for in synthetic generation? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>if random.random() < 0.3:
+    img = img.filter(ImageFilter.GaussianBlur(radius=0.8))</pre>
+    <p>A slight Gaussian blur is randomly applied to 30% of synthetic images to simulate camera defocus and add realism. This makes the model more robust to blurry real-world images.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">12</span> How does <code>write_yaml()</code> auto-generate the dataset configuration? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>def write_yaml(classes):
+    yaml_content = f"""path: data/dataset
+train: images/train
+val:   images/val
+nc: {len(classes)}
+names:
+"""
+    for i, c in enumerate(classes):
+        yaml_content += f"  {i}: {c}\n"
+
+    with open('config/dataset.yaml', 'w') as f:
+        f.write(yaml_content)</pre>
+    <p>It dynamically generates a valid YAML configuration based on the class list, ensuring the YOLO training pipeline knows the correct number of classes and their names.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">13</span> What is the purpose of background palettes in synthetic generation? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>BG_PALETTES = [
+    [(25,22,38),(40,35,55),(55,50,70)],   # night station
+    [(50,45,35),(70,60,40),(90,80,55)],   # day concrete
+    [(20,30,45),(30,45,60),(45,60,75)],   # blue-grey
+    [(35,25,25),(55,40,35),(70,55,45)],   # warm interior
+]</pre>
+    <p>Multiple color palettes simulate different lighting conditions (night, day, indoor, warm). The palette is cycled based on image index. This improves model robustness to varying environments.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">14</span> What tools can be used to annotate custom images? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <ul>
+      <li><strong>LabelImg</strong> — Open-source desktop tool, supports YOLO format</li>
+      <li><strong>Roboflow</strong> — Web-based annotation with auto-labeling features</li>
+      <li><strong>CVAT</strong> — Computer Vision Annotation Tool (open-source, web-based)</li>
+      <li><strong>Label Studio</strong> — Multi-format annotation platform</li>
+    </ul>
+    <p>After annotation, export in <strong>YOLO format</strong> and place images in <code>data/dataset/images/</code> and labels in <code>data/dataset/labels/</code>.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">15</span> What is the difference between training and validation sets? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>Set</th><th>Purpose</th><th>Used During</th></tr>
+      <tr><td>Training</td><td>Model learns patterns from this data</td><td>Training (weights updated)</td></tr>
+      <tr><td>Validation</td><td>Evaluate model performance, tune hyperparameters</td><td>After each epoch (no weight updates)</td></tr>
+      <tr><td>Test</td><td>Final evaluation on unseen data</td><td>After training is complete</td></tr>
+    </table>
+    <p>Typical split: 80% train, 20% validation. The model never trains on validation data, ensuring unbiased performance metrics.</p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 8: TRAINING PIPELINE -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<div class="section-header page-break"><div class="sec-num">8</div><h2>Training Pipeline</h2></div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">1</span> Explain the complete training workflow in <code>train.py</code>. <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <ol>
+      <li>Parse command-line arguments (yaml, model, epochs, batch, etc.)</li>
+      <li>Verify dataset YAML exists</li>
+      <li>Import and load base YOLO model: <code>model = YOLO('yolov8n.pt')</code></li>
+      <li>Build training kwargs dict with all parameters</li>
+      <li>Start training: <code>results = model.train(**train_kwargs)</code></li>
+      <li>Copy best weights: <code>runs/train/navigation_model/weights/best.pt → models/navigation_model_best.pt</code></li>
+      <li>Run validation: <code>metrics = model.val()</code></li>
+      <li>Print mAP@0.5 and mAP@0.5:0.95 scores</li>
+    </ol>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">2</span> What are the key training parameters and their defaults? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>Parameter</th><th>Default</th><th>Description</th></tr>
+      <tr><td><code>--yaml</code></td><td><code>config/dataset.yaml</code></td><td>Dataset configuration path</td></tr>
+      <tr><td><code>--model</code></td><td><code>yolov8n.pt</code></td><td>Base model for transfer learning</td></tr>
+      <tr><td><code>--epochs</code></td><td><code>50</code></td><td>Number of training epochs</td></tr>
+      <tr><td><code>--imgsz</code></td><td><code>640</code></td><td>Input image size</td></tr>
+      <tr><td><code>--batch</code></td><td><code>16</code></td><td>Batch size</td></tr>
+      <tr><td><code>--device</code></td><td><code>auto</code></td><td>cpu / 0 (GPU) / 0,1 (multi-GPU)</td></tr>
+      <tr><td><code>--workers</code></td><td><code>4</code></td><td>DataLoader worker threads</td></tr>
+      <tr><td><code>--resume</code></td><td><code>False</code></td><td>Resume from last checkpoint</td></tr>
+      <tr><td><code>--augment</code></td><td><code>False</code></td><td>Enable extra augmentation</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">3</span> What is the role of <code>exist_ok=True</code> in model training? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>model.train(
+    ...
+    project='runs/train',
+    name='navigation_model',
+    exist_ok=True,        # Don't raise error if folder exists
+)</pre>
+    <p>By default, YOLO creates a new folder for each run (navigation_model, navigation_model2, etc.). <code>exist_ok=True</code> allows overwriting the same folder, keeping the project clean and avoiding duplicate run directories.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">4</span> What is the difference between best.pt and last.pt? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <ul>
+      <li><strong>best.pt</strong> — Weights from the epoch with the highest validation mAP. This is the optimal model.</li>
+      <li><strong>last.pt</strong> — Weights from the final epoch. May be overfitted if training continued too long.</li>
+    </ul>
+    <p>The project copies <code>best.pt</code> to the models directory:</p>
+    <pre>best_src = os.path.join(project, name, 'weights', 'best.pt')
+shutil.copy(best_src, 'models/navigation_model_best.pt')</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">5</span> What is <code>model.val()</code> and what metrics does it return? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>metrics = model.val()
+print(f"mAP@0.5    : {metrics.box.map50:.4f}")    # mAP at IoU=0.5
+print(f"mAP@0.5:0.95: {metrics.box.map:.4f}")     # mAP averaged over IoU 0.5-0.95</pre>
+    <p><code>model.val()</code> runs the model on the validation set and computes detection metrics. Higher mAP values indicate better detection performance (1.0 = perfect).</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">6</span> How does the web-based training differ from CLI training? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>Feature</th><th>CLI (<code>train.py</code>)</th><th>Web (<code>app.py /api/train</code>)</th></tr>
+      <tr><td>Execution</td><td>Blocking (synchronous)</td><td>Background thread (async)</td></tr>
+      <tr><td>Progress</td><td>Console output</td><td>Poll <code>/api/train/status</code></td></tr>
+      <tr><td>Stop</td><td>Ctrl+C</td><td><code>/api/train/stop</code></td></tr>
+      <tr><td>Validation</td><td>Runs automatically after training</td><td>Not auto-run</td></tr>
+      <tr><td>Resume</td><td><code>--resume</code> flag</td><td>Not supported via API</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">7</span> What is overfitting and how can it be prevented? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p><strong>Overfitting</strong> occurs when the model memorizes training data instead of learning general patterns. Signs: high training accuracy, low validation accuracy.</p>
+    <p><strong>Prevention methods used in this project:</strong></p>
+    <ul>
+      <li>Data augmentation (flip, rotate, scale, mosaic)</li>
+      <li>Using pretrained weights (transfer learning)</li>
+      <li>Early stopping (save best.pt based on validation mAP)</li>
+      <li>Separate validation set to monitor generalization</li>
+      <li>Sufficient training data (100-200 images minimum)</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">8</span> What is mosaic augmentation? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p><strong>Mosaic augmentation</strong> combines 4 training images into a single composite image by:</p>
+    <ol>
+      <li>Randomly selecting 4 images from the training set</li>
+      <li>Cropping and resizing each to fit a quadrant</li>
+      <li>Combining them into one image</li>
+    </ol>
+    <p>Benefits: Exposes the model to more objects and context per batch, improves detection of small objects, and reduces the need for large batch sizes. Enabled with <code>mosaic=1.0</code> (100% probability).</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">9</span> What is the DataLoader workers parameter? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>p.add_argument('--workers', type=int, default=4)</pre>
+    <p><code>workers=4</code> means 4 parallel threads load and preprocess training images while the GPU trains on the current batch. This prevents the GPU from waiting for data (I/O bottleneck). More workers = faster data loading, but more CPU/RAM usage.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">10</span> What does <code>--resume</code> do in training? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>p.add_argument('--resume', action='store_true')
+# ...
+train_kwargs['resume'] = args.resume</pre>
+    <p>When <code>--resume</code> is set, training continues from the last saved checkpoint (<code>last.pt</code>) instead of starting fresh. This is useful when training is interrupted (power failure, manual stop) and you want to continue from where it left off without losing progress.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">11</span> What is the role of GPU in training vs. CPU? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>Aspect</th><th>CPU Training</th><th>GPU Training</th></tr>
+      <tr><td>Speed</td><td>Very slow (hours/days)</td><td>Fast (minutes/hours)</td></tr>
+      <tr><td>Parallelism</td><td>Limited cores (4-16)</td><td>Thousands of CUDA cores</td></tr>
+      <tr><td>Memory</td><td>System RAM</td><td>VRAM (4-24+ GB)</td></tr>
+      <tr><td>Cost</td><td>No extra hardware</td><td>NVIDIA GPU required</td></tr>
+    </table>
+    <p>The project notes: "Training on CPU is slow; use GPU if available." Inference (detection) on CPU is acceptable for real-time with YOLOv8n.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">12</span> How does the project save trained models? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre># Training output directory structure:
+runs/train/navigation_model/
+├── weights/
+│   ├── best.pt      # Best validation mAP
+│   └── last.pt      # Last epoch
+├── results.csv      # Metrics per epoch
+├── confusion_matrix.png
+├── F1_curve.png
+├── P_curve.png
+├── R_curve.png
+└── results.png
+
+# Copy best model to accessible location:
+shutil.copy('runs/train/navigation_model/weights/best.pt',
+            'models/navigation_model_best.pt')</pre>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 9: CONFIGURATION -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<div class="section-header page-break"><div class="sec-num">9</div><h2>Configuration & Settings</h2></div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">1</span> Explain the Settings class in <code>config/settings.py</code>. <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>class Settings:
+    SECRET_KEY    = os.environ.get('SECRET_KEY', 'nav-assist-secret-2024')
+    DEFAULT_CONF  = 0.40    # Confidence threshold
+    DEFAULT_IOU   = 0.45    # NMS IoU threshold
+    DEFAULT_MODEL = 'yolov8n.pt'
+
+    ZONES = {               # Station zone boundaries (fractional)
+        'entrance':  (0.30, 0.00, 0.70, 0.20),
+        'main_hall': (0.20, 0.20, 0.80, 0.60),
+        ...
+    }
+
+    CLASS_COLORS = {        # BGR colors per class
+        'person':          (219, 86, 26),
+        'wheelchair_user': (0, 140, 255),
+        ...
+    }
+    DEFAULT_COLOR = (100, 200, 50)</pre>
+    <p>All configuration is centralized in one class, making it easy to modify thresholds, zones, and colors without changing multiple files.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">2</span> How does the SECRET_KEY work? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>SECRET_KEY = os.environ.get('SECRET_KEY', 'nav-assist-secret-2024')</pre>
+    <p>Flask's SECRET_KEY is used for:</p>
+    <ul>
+      <li>Signing session cookies cryptographically</li>
+      <li>CSRF protection in forms</li>
+      <li>Flash message security</li>
+    </ul>
+    <p><code>os.environ.get()</code> first checks for an environment variable. If not set, falls back to the default string. In production, this should be a random secret set via environment variable.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">3</span> How are zone boundaries defined and what do the coordinates mean? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>'entrance': (0.30, 0.00, 0.70, 0.20)
+#            x1    y1    x2    y2</pre>
+    <p>Coordinates are <strong>fractions (0.0 to 1.0)</strong> of the frame dimensions:</p>
+    <ul>
+      <li><code>x1=0.30</code> → Zone starts at 30% from left</li>
+      <li><code>y1=0.00</code> → Zone starts at top</li>
+      <li><code>x2=0.70</code> → Zone ends at 70% from left</li>
+      <li><code>y2=0.20</code> → Zone ends at 20% from top</li>
+    </ul>
+    <p>For a 1280×720 frame: Entrance = pixels (384, 0) to (896, 144).</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">4</span> Why are colors stored in BGR format? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p>OpenCV uses BGR color ordering (historical from early camera hardware). Since all visualization is done with OpenCV functions (<code>cv2.rectangle</code>, <code>cv2.putText</code>, etc.), storing colors in BGR avoids conversion overhead:</p>
+    <pre>'person': (219, 86, 26)   # B=219, G=86, R=26 → Orange in RGB</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">5</span> How would you modify the system to add a new station zone? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <ol>
+      <li>Add zone to <code>Settings.ZONES</code> in <code>config/settings.py</code> with coordinates</li>
+      <li>Add zone to <code>ZONE_DISPLAY_NAMES</code> in <code>navigator.py</code></li>
+      <li>Add connections in <code>STATION_GRAPH</code> with instructions and arrows</li>
+      <li>Add zone color in <code>Visualizer._draw_zone_overlay()</code></li>
+      <li>Optionally add to <code>DESTINATIONS</code> list in <code>demo.py</code></li>
+    </ol>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">6</span> What is the role of <code>setup.bat</code> and <code>setup.sh</code>? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p>They automate project setup on Windows (<code>setup.bat</code>) and Linux/Mac (<code>setup.sh</code>):</p>
+    <ol>
+      <li>Create a Python virtual environment</li>
+      <li>Install dependencies from <code>requirements.txt</code></li>
+      <li>Create dataset directory structure</li>
+      <li>Run <code>prepare_dataset.py</code></li>
+    </ol>
+    <p>Usage: <code>setup.bat</code> (Windows) or <code>bash setup.sh</code> (Linux/Mac)</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">7</span> What happens when <code>DEFAULT_CONF</code> is increased to 0.80? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <p>Increasing confidence threshold to 0.80 means:</p>
+    <ul>
+      <li><strong>Fewer detections</strong> — Only highly confident detections (80%+) are shown</li>
+      <li><strong>Fewer false positives</strong> — Less incorrect detections</li>
+      <li><strong>More false negatives</strong> — May miss real passengers detected with lower confidence</li>
+      <li><strong>Better precision, worse recall</strong></li>
+    </ul>
+    <p>For a navigation assistance system, a lower threshold (0.40) is preferred — it's better to detect a passenger with a possible false alarm than to miss someone who needs help.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">8</span> Why are zone coordinates normalized (0 to 1) instead of pixel values? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <p>Normalized coordinates make the system <strong>resolution-independent</strong>:</p>
+    <ul>
+      <li>Same zones work for 640×480, 1280×720, or 1920×1080 cameras</li>
+      <li>No need to reconfigure when changing camera resolution</li>
+      <li>Zone proportions are maintained across different frame sizes</li>
+      <li>Conversion is simple: <code>pixel_x = fraction_x × frame_width</code></li>
+    </ul>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 10: PYTHON CONCEPTS -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<div class="section-header page-break"><div class="sec-num">10</div><h2>Python Concepts Used</h2></div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">1</span> How is threading used in the project? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p>Threading is used for 4 key background operations:</p>
+    <ol>
+      <li><strong>Training:</strong> <code>threading.Thread(target=run_training, daemon=True)</code></li>
+      <li><strong>Audio playback:</strong> <code>threading.Thread(target=self.speak, daemon=True)</code></li>
+      <li><strong>Synthetic dataset generation:</strong> Background thread in <code>/api/dataset/synthetic</code></li>
+      <li><strong>Roboflow download:</strong> Background thread in <code>/api/dataset/roboflow</code></li>
+    </ol>
+    <p><code>threading.Lock()</code> is used for camera access synchronization and TTS engine thread safety.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">2</span> What is a Python decorator? How is <code>@app.route()</code> used? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <p>A <strong>decorator</strong> is a function that modifies another function's behavior. <code>@app.route()</code> is Flask's decorator that maps URLs to Python functions:</p>
+    <pre>@app.route('/detect', methods=['GET'])   # URL: /detect
+def detect_page():                        # View function
+    return render_template('detect.html')
+
+@app.route('/api/train', methods=['POST'])  # POST to /api/train
+def start_training():
+    # Handle training request</pre>
+    <p>It registers the function as a handler for the specified URL and HTTP method.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">3</span> What is <code>argparse</code> and how is it used? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>p = argparse.ArgumentParser(description='...')
+p.add_argument('--epochs', type=int,   default=50)
+p.add_argument('--save',   action='store_true')  # Boolean flag
+p.add_argument('--mode',   choices=['image','video','live'])
+args = p.parse_args()
+
+print(args.epochs)  # 50 or user-specified value</pre>
+    <p><code>argparse</code> handles command-line argument parsing with type validation, defaults, choices, and auto-generated help messages.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">4</span> What is a generator function? How is <code>generate_frames()</code> one? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <p>A <strong>generator</strong> is a function that uses <code>yield</code> instead of <code>return</code>. It produces values lazily (one at a time) without loading everything into memory:</p>
+    <pre>def generate_frames():
+    while camera_active:
+        ret, frame = cap.read()
+        # ... process frame ...
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' +
+               buffer.tobytes() + b'\r\n')</pre>
+    <p>Each <code>yield</code> sends one JPEG frame. The function pauses until the next frame is requested by the client. This is memory-efficient for streaming thousands of frames.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">5</span> What is <code>os.path.join()</code> and why is it used? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>path = os.path.join('static', 'uploads', fname)
+# Windows: 'static\\uploads\\filename.jpg'
+# Linux:   'static/uploads/filename.jpg'</pre>
+    <p><code>os.path.join()</code> creates file paths using the correct separator for the operating system. This makes the code <strong>cross-platform compatible</strong> — it works on Windows (backslash) and Linux/Mac (forward slash).</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">6</span> Explain context managers (<code>with</code> statement) used in the project. <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre># Thread lock
+with camera_lock:              # Acquires lock, auto-releases on exit
+    camera_active = True
+
+# File operations
+with open(lbl_path, 'w') as f:  # Opens file, auto-closes on exit
+    f.write(label_data)
+
+# Zip extraction
+with zipfile.ZipFile(zpath, 'r') as z:  # Opens zip, auto-closes
+    z.extractall('data/dataset')</pre>
+    <p>The <code>with</code> statement ensures resources are properly cleaned up (lock released, file closed, etc.) even if an exception occurs.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">7</span> What is list comprehension and where is it used? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre># Filter model files
+models = [f for f in os.listdir('models') if f.endswith('.pt')]
+
+# Find train images in extracted zip
+train_imgs = [f for f in image_files if 'train' in str(f)]</pre>
+    <p>List comprehension creates lists concisely. It's equivalent to:</p>
+    <pre>models = []
+for f in os.listdir('models'):
+    if f.endswith('.pt'):
+        models.append(f)</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">8</span> What is the <code>global</code> keyword used for? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>def start_training():
+    global training_status        # Access module-level variable
+    training_status['running'] = True
+    ...
+
+def stop_camera():
+    global camera_active          # Modify module-level variable
+    camera_active = False</pre>
+    <p>The <code>global</code> keyword tells Python to use the module-level variable instead of creating a local one. It's needed when <strong>assigning</strong> to a global variable inside a function. Reading globals doesn't require it.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">9</span> What is <code>f-string</code> formatting? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>print(f"mAP@0.5: {metrics.box.map50:.4f}")     # 4 decimal places
+print(f"Progress: {pct:.0f}% frame {idx}/{total}")  # No decimals
+fname = f"{ts}_{fname}"                           # String concatenation
+text = f'{label} {int(conf * 100)}%'              # Expression</pre>
+    <p>f-strings (formatted string literals) embed Python expressions inside strings using <code>{}</code>. They support format specifiers like <code>:.4f</code> (4 decimal float), <code>:.0f</code> (no decimals), <code>:>5</code> (right-aligned, width 5).</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">10</span> What is <code>shutil</code> used for? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>import shutil
+
+shutil.copy(best_src, dst)          # Copy single file
+shutil.copy2(img_path, dst_img)     # Copy with metadata (timestamps)
+shutil.rmtree(extract_dir)         # Delete entire directory tree</pre>
+    <p><code>shutil</code> provides high-level file operations. <code>copy2()</code> preserves file metadata. <code>rmtree()</code> recursively deletes directories (like <code>rm -rf</code>).</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">11</span> What is exception handling and how is it used? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>try:
+    from ultralytics import YOLO
+    self.model = YOLO(model_path)
+    return True, f"Model loaded: {model_path}"
+except Exception as e:
+    self.model = None
+    return False, f"Failed to load model: {e}"
+finally:
+    training_status['running'] = False  # Always runs</pre>
+    <p><code>try/except/finally</code> blocks handle errors gracefully. <code>except Exception as e</code> catches all exceptions and stores the error message. <code>finally</code> runs whether or not an exception occurred — used to clean up resources.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">12</span> What is the <code>Path</code> class from <code>pathlib</code>? <span class="tag tag-code">Code</span></div>
+  <div class="answer">
+    <pre>from pathlib import Path
+
+DATASET_ROOT = Path('data/dataset')
+img_dir = DATASET_ROOT / 'images' / 'train'   # Path joining with /
+img_dir.mkdir(parents=True, exist_ok=True)     # Create directories
+list(img_dir.glob('*.jpg'))                    # Find files
+img.stem                                       # Filename without extension</pre>
+    <p><code>Path</code> provides an object-oriented interface for filesystem paths. It's more readable than <code>os.path</code> and supports operator overloading (<code>/</code> for path joining).</p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 11: CODE-LEVEL VIVA -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<div class="section-header page-break"><div class="sec-num">11</div><h2>Code-Level Viva Questions</h2></div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">1</span> What will happen if <code>detector.detect()</code> is called before <code>detector.load()</code>? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <p>It will return <code>None</code> because <code>self.model</code> is <code>None</code>:</p>
+    <pre>def detect(self, frame):
+    if not self.is_loaded():   # self.model is None → False
+        return None            # Returns None safely</pre>
+    <p>Downstream code handles this: <code>format_results(None)</code> returns <code>[]</code>, and the Visualizer skips drawing if results is None.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">2</span> Why is <code>verbose=False</code> used in <code>model.predict()</code>? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <p><code>verbose=False</code> suppresses console output for each prediction. Since <code>predict()</code> is called on every frame (30+ times per second), verbose logging would:</p>
+    <ul>
+      <li>Flood the console with output</li>
+      <li>Slow down processing due to I/O overhead</li>
+      <li>Make useful log messages hard to read</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">3</span> What does <code>results[0]</code> mean in the detect method? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <pre>results = self.model.predict(frame, ...)
+return results[0] if results else None</pre>
+    <p><code>model.predict()</code> returns a <strong>list</strong> of Results objects — one per input image. Since we pass a single frame, we take <code>results[0]</code> (the first and only result). The <code>if results</code> check handles the edge case where an empty list is returned.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">4</span> How does <code>set_conf()</code> prevent invalid values? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <pre>def set_conf(self, conf: float):
+    self.conf = max(0.01, min(0.99, conf))</pre>
+    <p>It uses <strong>clamping</strong>: <code>min(0.99, conf)</code> caps the maximum at 0.99, and <code>max(0.01, ...)</code> sets the minimum to 0.01. This ensures the confidence threshold stays in a valid range (0.01 to 0.99), preventing edge cases like 0 (everything detected) or 1 (nothing detected).</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">5</span> What is the purpose of <code>frame.copy()</code> in the Visualizer? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <pre>def draw(self, frame, results, navigator, ...):
+    out = frame.copy()   # Create a copy to draw on</pre>
+    <p>NumPy arrays are passed by reference. Without <code>.copy()</code>, drawing operations would modify the original frame, which could affect other processing (e.g., the raw frame is needed for encoding in streaming). The copy ensures the original frame remains unmodified.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">6</span> Explain the line: <code>x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())</code> <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <ul>
+      <li><code>box.xyxy[0]</code> — Gets the first (only) bounding box as a PyTorch tensor</li>
+      <li><code>.tolist()</code> — Converts tensor to Python list: <code>[123.45, 67.89, 456.12, 345.67]</code></li>
+      <li><code>map(int, ...)</code> — Converts each float to integer: <code>[123, 67, 456, 345]</code></li>
+      <li><code>x1, y1, x2, y2 = ...</code> — Tuple unpacking into 4 variables</li>
+    </ul>
+    <p>This converts YOLO's float tensor coordinates to integer pixel values for OpenCV drawing functions.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">7</span> What is the <code>*'mp4v'</code> syntax in <code>VideoWriter_fourcc</code>? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <pre>fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+# Equivalent to:
+fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')</pre>
+    <p>The <code>*</code> operator <strong>unpacks</strong> the string into individual characters. <code>VideoWriter_fourcc</code> expects 4 separate character arguments, so <code>*'mp4v'</code> passes <code>'m'</code>, <code>'p'</code>, <code>'4'</code>, <code>'v'</code> as separate arguments.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">8</span> Why does <code>generate_frames()</code> use <code>try/finally</code>? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <pre>try:
+    while camera_active:
+        ret, frame = cap.read()
+        # ... process and yield frames ...
+finally:
+    cap.release()                    # Always release camera
+    with camera_lock:
+        camera_active = False        # Always reset state</pre>
+    <p><code>finally</code> ensures the camera is released and state is reset even if an exception occurs (camera disconnects, encoding fails, client disconnects). Without it, the camera could remain locked and unavailable.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">9</span> What is <code>rsplit('.', 1)</code> and why is <code>1</code> passed? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <pre>filename.rsplit('.', 1)[1].lower()
+# "photo.backup.jpg" → ['photo.backup', 'jpg'] → 'jpg'</pre>
+    <p><code>rsplit('.', 1)</code> splits from the <strong>right</strong> with max 1 split. This correctly handles filenames with multiple dots. <code>split('.', 1)</code> from the left would give <code>['photo', 'backup.jpg']</code> — wrong extension.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">10</span> How does <code>int(time.time()) % 3 == 0</code> work for periodic audio? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <p><code>time.time()</code> returns Unix timestamp (e.g., 1700000000.123). <code>int()</code> truncates to seconds. <code>% 3 == 0</code> is true every 3 seconds (when timestamp is divisible by 3).</p>
+    <p>This is a simple timer mechanism that triggers audio every ~3 seconds without needing a separate timer thread. Combined with the 4-second debounce, it prevents rapid-fire announcements.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">11</span> What is <code>action='store_true'</code> in argparse? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <pre>p.add_argument('--save',     action='store_true')
+p.add_argument('--no-audio', action='store_true')</pre>
+    <p><code>action='store_true'</code> creates a boolean flag. If the flag is present, the value is <code>True</code>; if absent, it's <code>False</code>. No value argument is needed:</p>
+    <pre>python detect.py --save          # args.save = True
+python detect.py                 # args.save = False</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">12</span> What does <code>cv2.addWeighted(overlay, 0.12, img, 0.88, 0, img)</code> do? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <p>Formula: <code>output = α × src1 + β × src2 + γ</code></p>
+    <ul>
+      <li><code>overlay</code> — Image with filled colored rectangles (zones)</li>
+      <li><code>0.12</code> (α) — 12% weight for overlay (subtle transparency)</li>
+      <li><code>img</code> — Original frame</li>
+      <li><code>0.88</code> (β) — 88% weight for original (dominant)</li>
+      <li><code>0</code> (γ) — No brightness offset</li>
+      <li>Last <code>img</code> — Output destination (modifies in-place)</li>
+    </ul>
+    <p>Result: Zones appear as 12% transparent colored overlays on the original frame.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">13</span> What is the <code>Passenger</code> class in demo.py's synthetic mode? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <pre>class Passenger:
+    def __init__(self, cls, x, y):
+        self.cls  = cls
+        self.x    = float(x)
+        self.y    = float(y)
+        self.vx   = random.uniform(-1.2, 1.2)   # velocity x
+        self.vy   = random.uniform(-0.5, 0.5)   # velocity y
+        self.conf = random.uniform(0.65, 0.97)   # simulated confidence
+
+    def update(self):
+        self.x += self.vx
+        self.y += self.vy
+        if self.x < 30 or self.x > W-80: self.vx *= -1   # bounce
+        if self.y < 50 or self.y > H-100: self.vy *= -1</pre>
+    <p>It simulates moving passengers with random velocities. They bounce off screen edges, creating an animated demo without real YOLO detection.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">14</span> How does exponential moving average FPS smoothing work in demo.py? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <pre>fps = 0.9 * fps + 0.1 * (1.0 / max(now - prev_time, 0.001))</pre>
+    <p>This is an <strong>exponential moving average (EMA)</strong>:</p>
+    <ul>
+      <li>90% weight on previous FPS value (smoothing)</li>
+      <li>10% weight on current frame's FPS (new measurement)</li>
+      <li>Prevents jumpy FPS display from frame-to-frame variations</li>
+      <li><code>max(..., 0.001)</code> prevents division by zero</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">15</span> What is the <code>cv2.getTextSize()</code> used for? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <pre>(tw, th), _ = cv2.getTextSize(text, FONT, 0.55, 1)
+ty = max(y1 - 8, th + 4)
+cv2.rectangle(img, (x1, ty-th-4), (x1+tw+8, ty+2), color, -1)  # Background
+cv2.putText(img, text, (x1+4, ty-2), FONT, 0.55, (255,255,255), 1)</pre>
+    <p><code>getTextSize()</code> returns the width and height of a text string at a given font and scale. This is used to draw a precisely-sized colored background rectangle behind label text, ensuring the text is always readable regardless of the underlying image content.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">16</span> What does <code>os.makedirs('models', exist_ok=True)</code> do? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <p><code>os.makedirs()</code> creates a directory and all intermediate parent directories. <code>exist_ok=True</code> prevents an error if the directory already exists. Without it, creating an existing directory raises <code>FileExistsError</code>.</p>
+    <pre>os.makedirs('models', exist_ok=True)     # Create models/ if not exists
+os.makedirs(UPLOAD_FOLDER, exist_ok=True) # Create static/uploads/</pre>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">17</span> How does the system handle concurrent training requests? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <pre>if training_status['running']:
+    return jsonify({'success': False, 'message': 'Training already running'})</pre>
+    <p>The system checks the <code>training_status['running']</code> flag before starting new training. If training is already in progress, it rejects the request with an error message. This prevents multiple simultaneous training sessions that would compete for GPU/CPU resources.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">18</span> What is the <code>replace('\\\\', '/')</code> used for in result paths? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <pre>'result_image': '/' + out_path.replace('\\', '/')</pre>
+    <p>On Windows, <code>os.path.join()</code> uses backslashes (<code>static\uploads\file.jpg</code>). Web URLs use forward slashes. This conversion ensures the file path works as a valid URL in the browser. The leading <code>/</code> makes it an absolute URL path.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">19</span> Why is <code>frame.shape[:2]</code> used instead of <code>frame.shape</code>? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <pre>h, w = frame.shape[:2]</pre>
+    <p>OpenCV frames are NumPy arrays with shape <code>(height, width, channels)</code> — e.g., <code>(720, 1280, 3)</code>. Using <code>[:2]</code> takes only the first 2 values (height, width), ignoring the 3rd (color channels). This works for both color (3 channels) and grayscale (no channel dimension) images.</p>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">20</span> What is the significance of <code>quality=88</code> in synthetic image saving? <span class="tag tag-viva">Viva</span></div>
+  <div class="answer">
+    <pre>img.save(img_dir / f"{name}.jpg", quality=88)</pre>
+    <p>JPEG quality ranges from 1 (worst) to 100 (best). Quality 88 is a good balance between:</p>
+    <ul>
+      <li><strong>File size</strong> — Lower than quality 95 (default), saving disk space for large datasets</li>
+      <li><strong>Visual quality</strong> — Minimal visible compression artifacts at 88</li>
+      <li><strong>Training benefit</strong> — Slight compression actually helps as augmentation (the model learns to handle compressed images)</li>
+    </ul>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 12: REAL-WORLD QUESTIONS -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<div class="section-header page-break"><div class="sec-num">12</div><h2>Real-World & Application Questions</h2></div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">1</span> What are the real-world applications of this system? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <ul>
+      <li><strong>Railway stations:</strong> Guide differently-abled passengers to platforms, restrooms, exits</li>
+      <li><strong>Airports:</strong> Navigate visually impaired travelers to gates</li>
+      <li><strong>Hospitals:</strong> Direct patients in wheelchairs to departments</li>
+      <li><strong>Shopping malls:</strong> Assist elderly shoppers with navigation</li>
+      <li><strong>Smart cities:</strong> Integrate with IoT for automated assistance</li>
+      <li><strong>Disaster management:</strong> Guide evacuees to exits</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">2</span> What are the limitations of this system? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <ul>
+      <li><strong>Fixed station layout:</strong> Zone boundaries are hardcoded and frame-dependent</li>
+      <li><strong>Single camera:</strong> Cannot track passengers across multiple cameras</li>
+      <li><strong>Synthetic training data:</strong> Real-world performance requires real annotated images</li>
+      <li><strong>Lighting sensitivity:</strong> YOLO performance degrades in poor lighting</li>
+      <li><strong>Privacy concerns:</strong> Camera-based detection raises surveillance issues</li>
+      <li><strong>Internet dependency:</strong> gTTS fallback requires internet</li>
+      <li><strong>No obstacle detection:</strong> Doesn't detect stairs, gaps, or physical barriers</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">3</span> How could this system be improved? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <ul>
+      <li><strong>Multi-camera tracking:</strong> Track passengers across multiple cameras using Re-ID</li>
+      <li><strong>Dynamic zone mapping:</strong> Use SLAM or marker-based localization instead of fixed zones</li>
+      <li><strong>Mobile app:</strong> Smartphone-based version with haptic feedback</li>
+      <li><strong>Obstacle detection:</strong> Detect stairs, escalators, and barriers</li>
+      <li><strong>Indoor positioning:</strong> Combine with BLE beacons for precise localization</li>
+      <li><strong>Multi-language TTS:</strong> Support regional languages</li>
+      <li><strong>Edge deployment:</strong> Run on Jetson Nano or Raspberry Pi for cost efficiency</li>
+      <li><strong>Real dataset:</strong> Collect and annotate real station images</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">4</span> How does this project address accessibility? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <ul>
+      <li><strong>Visual guidance:</strong> On-screen arrows and zone overlays for sighted staff</li>
+      <li><strong>Audio guidance:</strong> TTS announcements for visually impaired passengers</li>
+      <li><strong>Multi-class detection:</strong> Different assistance for wheelchair users vs. blind persons</li>
+      <li><strong>Route optimization:</strong> BFS finds shortest path, reducing walking distance</li>
+      <li><strong>Elevator awareness:</strong> Routes wheelchair users through elevator zone</li>
+      <li><strong>Real-time processing:</strong> Immediate feedback for time-sensitive navigation</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">5</span> What ethical considerations apply to this system? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <ul>
+      <li><strong>Privacy:</strong> Camera surveillance of public spaces — need consent/notice</li>
+      <li><strong>Bias:</strong> Model may perform differently across demographics if training data is biased</li>
+      <li><strong>Misclassification:</strong> Incorrectly labeling someone as "elderly" or "disabled" could be offensive</li>
+      <li><strong>Data storage:</strong> Recorded footage must comply with data protection laws (GDPR, etc.)</li>
+      <li><strong>Reliability:</strong> System failures in safety-critical navigation could be dangerous</li>
+      <li><strong>Consent:</strong> Passengers should be informed about AI-based monitoring</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">6</span> How does this project compare to existing navigation systems? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <table>
+      <tr><th>Feature</th><th>This Project</th><th>Google Maps / NaviLens</th></tr>
+      <tr><td>Detection</td><td>Camera-based AI (YOLO)</td><td>GPS / QR codes</td></tr>
+      <tr><td>Indoor Use</td><td>Yes (camera-based)</td><td>Limited (no GPS indoors)</td></tr>
+      <tr><td>Accessibility Focus</td><td>Primary goal (6 classes)</td><td>General navigation</td></tr>
+      <tr><td>Audio Guide</td><td>Yes (pyttsx3/gTTS)</td><td>Yes</td></tr>
+      <tr><td>Infrastructure</td><td>Camera + server</td><td>Smartphone only</td></tr>
+      <tr><td>Cost</td><td>Low (open-source)</td><td>Free (commercial)</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">7</span> What hardware is needed to deploy this system? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <ul>
+      <li><strong>Camera:</strong> USB webcam, IP camera, or CCTV with RTSP stream</li>
+      <li><strong>Server:</strong> PC with Python 3.8+ (CPU works; GPU recommended for training)</li>
+      <li><strong>Speaker:</strong> For audio announcements at station</li>
+      <li><strong>Network:</strong> LAN for web UI access; optional internet for gTTS</li>
+      <li><strong>Minimum specs:</strong> 4GB RAM, modern CPU (i5+), 10GB disk space</li>
+      <li><strong>Recommended:</strong> NVIDIA GPU (RTX 2060+) for training, 16GB RAM</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">8</span> How would you scale this system for a large railway station? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <ol>
+      <li>Deploy multiple cameras covering different areas</li>
+      <li>Run separate YOLO instances per camera feed</li>
+      <li>Use a central server to aggregate detections</li>
+      <li>Implement multi-camera tracking with Re-ID</li>
+      <li>Expand the zone graph for the actual station layout</li>
+      <li>Use message queues (Redis/RabbitMQ) for inter-service communication</li>
+      <li>Deploy on GPU server cluster for real-time multi-stream processing</li>
+      <li>Add a mobile app for individual passenger guidance</li>
+    </ol>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">9</span> What is the SDG (Sustainable Development Goal) relevance of this project? <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <ul>
+      <li><strong>SDG 10 — Reduced Inequalities:</strong> Provides equal access to transportation for differently-abled persons</li>
+      <li><strong>SDG 11 — Sustainable Cities:</strong> Makes public transport infrastructure accessible and inclusive</li>
+      <li><strong>SDG 3 — Good Health:</strong> Supports safe mobility for elderly and disabled passengers</li>
+      <li><strong>SDG 9 — Industry & Innovation:</strong> Uses AI technology for social infrastructure improvement</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-item">
+  <div class="question"><span class="q-num">10</span> Summarize the complete system in 5 key points for a presentation. <span class="tag tag-theory">Theory</span></div>
+  <div class="answer">
+    <ol>
+      <li><strong>Problem:</strong> Differently-abled passengers face difficulties navigating complex railway stations without assistance.</li>
+      <li><strong>Solution:</strong> AI-powered system using YOLOv8 object detection to identify 6 types of passengers (wheelchair users, blind persons, elderly, etc.) from camera feeds.</li>
+      <li><strong>Navigation:</strong> BFS graph algorithm routes passengers through 9 station zones with step-by-step instructions and directional arrows.</li>
+      <li><strong>Output:</strong> Real-time visual annotations (bounding boxes, zone overlays, arrows) and audio guidance (pyttsx3/gTTS) for immediate, accessible assistance.</li>
+      <li><strong>Interface:</strong> Full Flask web application with dashboard, training UI, detection modes (image/video/live), and interactive route planner — all running locally for privacy.</li>
+    </ol>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- FOOTER -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<div class="footer">
+  <p><strong>Navigation Assistance System for Differently-Abled Passengers</strong></p>
+  <p>Total Questions: 167 | Topics: 12 Sections</p>
+  <p>Technologies: Python, YOLOv8, Flask, OpenCV, BFS, pyttsx3, gTTS, PIL, PyTorch</p>
+  <p style="margin-top:10px; color:#9ca3af;">Generated for exam preparation • Print via browser: Ctrl+P → Save as PDF</p>
+</div>
+
+</div> <!-- /container -->
+
+</body>
+</html>

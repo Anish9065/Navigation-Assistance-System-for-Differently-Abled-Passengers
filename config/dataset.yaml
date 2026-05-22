@@ -1,0 +1,11 @@
+path: data/dataset
+train: images/train
+val:   images/val
+nc: 6
+names:
+  0: person
+  1: wheelchair_user
+  2: blind_person
+  3: person_with_crutches
+  4: elderly_person
+  5: person_with_luggage
