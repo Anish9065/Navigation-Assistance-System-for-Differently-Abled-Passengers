@@ -23,6 +23,7 @@ class AudioGuide:
             self._engine.setProperty('volume', 1.0)
         except Exception:
             self._engine = None
+            print("[AudioGuide] pyttsx3 not available, using gTTS/print fallback")
 
     # ── Speak (blocking) ─────────────────────────────────────────
     def speak(self, text: str):

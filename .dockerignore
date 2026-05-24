@@ -1,0 +1,13 @@
+# Ignore things Render doesn't need
+__pycache__/
+*.py[cod]
+.vscode/
+.idea/
+.git/
+runs/
+data/
+static/uploads/*
+*.egg-info/
+.env
+*.swp
+*.swo

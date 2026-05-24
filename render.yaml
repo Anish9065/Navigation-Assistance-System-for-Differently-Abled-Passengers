@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: navigation-assistance
+    runtime: docker
+    repo: https://github.com/Anish9065/Navigation-Assistance-System-for-Differently-Abled-Passengers
+    plan: free
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: "3.10"
